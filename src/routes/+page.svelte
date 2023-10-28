@@ -101,12 +101,13 @@
    a:hover,
    a:focus {
       color: var(--color-lightest);
-      text-decoration: underline;
    }
 
    footer {
-      padding: 4px 10px;
+      padding: 6px 12px;
       justify-content: space-between;
-      background-color: rgba(0,0,0,0.2);
+      background-color: rgba(0, 0, 0, 0.2);
+      border-top-left-radius: 3px;
+      border-top-right-radius: 3px;
    }
 </style>

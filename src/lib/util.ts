@@ -45,10 +45,10 @@ function parsePackages(modLines: string[], startIndex = 2) {
 		const keys = Object.keys(pckg);
 
 		for (const match of regMatch) {
-			if (!match[1]) return null; //first group
+			if (match[1] == null) return null; //first group
 
 			const key = keys[i++];
-			if (key == "name" || "img") (pckg as any)[key] = String(match[1]);
+			if (key == "name" || key == "img") (pckg as any)[key] = String(match[1]);
 			else (pckg as any)[key] = Number(match[1]);
 		}
 		packages.push(pckg);
@@ -71,21 +71,24 @@ function parseResearch(modLines: string[], startIndex: number) {
 		let i = 0;
 		const res: App.Research = {
 			name: "null",
-			tab: null,
-			category: null,
+			tab: "null",
+			category: "null",
 			cost: 0,
 			resPoints: 0,
 			xp: 0,
 			year: 0,
 			res: 1,
 			x: 0,
-			reqRes: 0,
+			reqRes: 1,
 			y: 0
 		};
 		const keys = Object.keys(res);
 		for (const match of regMatch) {
-			if (!match[1]) return null; //first group
-			(res as any)[keys[i++]] = match[1];
+			if (match[1] == null) return null; //first group
+
+			const key = keys[i++];
+			if (key == "name" || key == "tab" || key == "category") (res as any)[key] = String(match[1]);
+			else (res as any)[key] = Number(match[1]);
 		}
 		research.push(res);
 

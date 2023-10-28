@@ -23,6 +23,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@tauri-apps/api": "^1.5.1"
+		"@tauri-apps/api": "^1.5.1",
+		"iconify-icon": "^1.0.8"
 	}
 }

@@ -37,16 +37,16 @@ declare global {
 		}
 		interface Research {
 			name: string;
-			tab;
-			category;
+			tab: string; //CPU or Tech
+			category: string; //eg. DIP, PLCC, Core
 			cost: number;
 			resPoints: number;
-			xp: number;
-			year: number;
-			res: number;
-			x: number;
-			reqRes: number;
-			y: number;
+			xp: number; //required cpu xp to unlock
+			year: number; //min unlock year
+			res: number; //whether researched (0 - locked, 1 - unlocked, 2 - researched)
+			x: number; //position on R&D screen
+			reqRes: number; //whether required tech is researched(?)
+			y: number; //position on R&D screen
 		}
 	}
 }

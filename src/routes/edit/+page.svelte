@@ -1,22 +1,31 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import PackageEdit from '$lib/PackageEdit.svelte';
 	import { formatNumber } from '$lib/util';
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
 
     const MOD: Writable<App.ModData> = getContext('MOD');
     console.log($MOD);
+
+    let editingIndex: number | null = null;
+    const onEditExit = () => editingIndex = null;
 </script>
 
 <h2>{$MOD.meta.name}</h2>
 <header class="row">
-    <button class="btn" on:click={() => goto("/")}>Back</button>
-    <button class="btn" on:click={() => goto("/")}>Save</button>
+    <button class="btn" on:click={() => goto("/")}>
+        <iconify-icon icon="ic:baseline-arrow-back"/>
+    </button>
+    <button class="btn" on:click={() => goto("/")}>
+        <iconify-icon icon="ic:baseline-save"/>
+    </button>
 </header>
 
 <main class="column">
-{#if $MOD}    
-
+{#if editingIndex != null}
+    <PackageEdit editing={$MOD.packages[editingIndex]} onExit={onEditExit}></PackageEdit>
+{:else if $MOD}    
     <div class="table-wrapper flex-fill">
         <table class="package-table">
             {#if $MOD.packages?.length}
@@ -34,8 +43,8 @@
                 </tr>
             </thead>
             <tbody>
-                {#each $MOD.packages as pckg}
-                <tr class="package-item">
+                {#each $MOD.packages as pckg, id}
+                <tr class="package-item" on:click={() => editingIndex = id}>
                     <td class="row"><img class="package-img" src="/package/{pckg.img}.png" alt=""></td>
                     <td>{pckg.name}</td>
                     <td>${formatNumber(pckg.cost)}</td>
@@ -45,7 +54,9 @@
                     <td>{formatNumber(pckg.stab)}</td>
                     <td>{formatNumber(pckg.build)}</td>
                     <td>
-                        {#if !pckg.res}<span>RES</span>{/if}
+                        {#if pckg.res < 2}
+                        <iconify-icon icon="ic:baseline-science" title="Has associated research" style="opacity: 0.8;"/>
+                        {/if}
                     </td>
                 </tr>
                 {/each}
@@ -53,7 +64,7 @@
             {/if}
             <tr>
                 <td class="package-add-item" colspan="9">
-                    <button type="button">+</button>
+                    <button type="button"><iconify-icon icon="ic:baseline-add-circle-outline"/></button>
                 </td>
             </tr>
         </table>
@@ -73,10 +84,6 @@
         background-color: var(--color-ht-primary);
     }
 
-    .table-wrapper {
-        overflow-y: auto;
-    }
-
     .package-table {
         padding: 0;
         margin: 14px auto;
@@ -94,7 +101,7 @@
     .package-table th {
         cursor: default;
         padding: 8px 10px;
-        background-color: var(--color-darkish);
+        background-color: var(--color-ht-primary);
     }
     .package-table th:first-child {
         border-top-left-radius: var(--radius);
@@ -105,10 +112,9 @@
 
     .package-item {
         font-size: 1.25rem;
-        /* background-color: rgba(255, 255, 255, 0.75); */
     }
     .package-item:hover {
-        background-color: rgba(0,0,0, 0.4);
+        background-color: var(--color-highlight-blue);
         cursor: pointer;
     }
     .package-img {
@@ -124,7 +130,7 @@
         position: sticky;
         top: 0;
         justify-content: space-between;
-        background-color: rgba(0,0,0, 0.2);
+        background-color: rgba(0, 0, 0, 0.2);
         padding: 8px;
     }
 </style>
