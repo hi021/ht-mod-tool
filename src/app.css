@@ -101,10 +101,8 @@ button {
 	justify-content: center;
 	align-items: center;
 	--clr: var(--color-gray);
-	/* color: var(--color-darkest); */
 	text-decoration: none;
 	font-size: 1rem;
-	/* border: 1px solid var(--color-darkest); */
 	border-radius: 0.4rem;
 	border-style: solid;
 	background-color: hsl(var(--clr));
@@ -153,28 +151,24 @@ button[disabled] {
 
 .btn-blue {
 	--clr: var(--color-blue);
-	/* color: var(--color-lightest); */
 }
 .btn-blue:not([disabled]):hover {
 	background-color: hsl(var(--color-blue-h));
 }
 .btn-green {
 	--clr: var(--color-green);
-	/* color: var(--color-lightest); */
 }
 .btn-green:not([disabled]):hover {
 	background-color: hsl(var(--color-green-h));
 }
 .btn-gray {
 	--clr: var(--color-gray);
-	/* color: var(--color-darkest); */
 }
 .btn-gray:not([disabled]):hover {
 	background-color: hsl(var(--color-gray-h));
 }
 .btn-red {
 	--clr: var(--color-red);
-	/* color: var(--color-lightest); */
 }
 .btn-red:not([disabled]):hover {
 	background-color: hsl(var(--color-red-h));
@@ -187,7 +181,6 @@ button[disabled] {
 }
 .btn-yellow {
 	--clr: var(--color-yellow);
-	/* color: var(--color-darkest); */
 }
 .btn-yellow:not([disabled]):hover {
 	background-color: hsl(var(--color-yellow-h));
@@ -221,6 +214,7 @@ hr {
 .column-center,
 .row-center {
 	align-items: center;
+	justify-content: center;
 }
 .flex-fill {
 	flex: auto 1 1;
@@ -242,4 +236,14 @@ hr {
 	font-weight: 600;
 	padding: 0.25rem;
 	background-color: rgba(255, 20, 60, 0.6);
+}
+
+.btn-menu {
+	border-radius: 50%;
+	font-size: 1.5rem;
+	padding: 8px;
+	background-color: rgba(255, 255, 255, 0.45);
+}
+.btn-menu:hover {
+	background-color: rgba(255, 255, 255, 0.8);
 }
