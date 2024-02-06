@@ -32,7 +32,7 @@ declare global {
 			build: number;
 			res: number; //whether researched (0 - locked, 1 - unlocked, 2 - researched)
 			maxClock: number; //kHz
-			maxCore: number; //highest supported core index
+			maxCore: string; //highest supported core index
 			img: string; //image name (eg. PLCC24)
 		}
 		interface Research {

@@ -30,7 +30,7 @@ function parsePackages(modLines: string[], startIndex = 2) {
 
 		let i = 0;
 		const pckg: App.Package = {
-			name: "null",
+			name: "none",
 			cost: 0,
 			time: 0,
 			unit: 0,
@@ -38,8 +38,8 @@ function parsePackages(modLines: string[], startIndex = 2) {
 			stab: 0,
 			build: 0,
 			res: 1,
-			maxClock: 0,
-			maxCore: 0,
+			maxClock: 200,
+			maxCore: "0",
 			img: "DIP14"
 		};
 		const keys = Object.keys(pckg);
@@ -48,7 +48,7 @@ function parsePackages(modLines: string[], startIndex = 2) {
 			if (match[1] == null) return null; //first group
 
 			const key = keys[i++];
-			if (key == "name" || key == "img") (pckg as any)[key] = String(match[1]);
+			if (key == "name" || key == "img" || key == "maxCore") (pckg as any)[key] = String(match[1]);
 			else (pckg as any)[key] = Number(match[1]);
 		}
 		packages.push(pckg);

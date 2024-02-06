@@ -102,7 +102,6 @@ button {
 	align-items: center;
 	--clr: var(--color-gray);
 	text-decoration: none;
-	font-size: 1rem;
 	border-radius: 0.4rem;
 	border-style: solid;
 	background-color: hsl(var(--clr));
@@ -199,6 +198,18 @@ hr {
 	margin: 0;
 }
 
+h1,
+h2 {
+	margin: 0;
+	text-align: center;
+	user-select: none;
+}
+h2 {
+	padding: 10px 0;
+	font-weight: 500;
+	font-size: 1.75rem;
+}
+
 /* FLEX */
 .row,
 .column,
@@ -226,9 +237,14 @@ hr {
 	flex-direction: column;
 	width: 70%;
 	margin: 0.5rem auto;
-	background-color: rgba(0, 0, 0, 0.2);
-	padding: 12px;
+	background-color: rgba(255, 255, 255, 0.3);
+	padding: 16px;
 	border-radius: 6px;
+}
+form label {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 12px;
 }
 
 .error-p {
@@ -242,8 +258,14 @@ hr {
 	border-radius: 50%;
 	font-size: 1.5rem;
 	padding: 8px;
-	background-color: rgba(255, 255, 255, 0.45);
+	background-color: rgba(255, 255, 255, 0.5);
 }
 .btn-menu:hover {
-	background-color: rgba(255, 255, 255, 0.8);
+	background-color: rgba(255, 255, 255, 0.75);
+}
+
+.unselectable {
+	-webkit-user-select: none;
+	user-select: none;
+	-webkit-user-drag: none;
 }

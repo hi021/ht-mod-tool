@@ -58,21 +58,19 @@
 </main>
 
 <style>
-   h1, h2 {
-      margin: 0;
-      text-align: center;
-      user-select: none;
-   }
    h1 {
+      margin: 0;
       margin-top: 16px;
-      font-weight: 500;
+      font-weight: 600;
       font-size: 2.5rem;
    }
    h2 {
+      padding: 0;
       margin-bottom: 40px;
       margin-left: 50%;
       font-weight: 400;
       font-size: 1.75rem;
+      text-align: left;
    }
    
    .btn-container {
@@ -81,7 +79,7 @@
    .main-menu-btn {
       background: none;
       width: 100%;
-      font-size: 1.75rem;
+      font-size: 2rem;
       border: none;
       border-radius: 0;
       padding: 12px 4px;
