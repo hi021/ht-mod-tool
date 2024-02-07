@@ -5,6 +5,10 @@
     const Len_Name = 30;
     const Len_Author = 24;
     const Len_Version = 10;
+
+    let name = "";
+    let author = "";
+    let version = "";
 </script>
 
 <main>
@@ -12,17 +16,17 @@
     <form class="form">
         <label>
             Mod name
-            <input type="text" id="name" name="name" maxlength="{Len_Name}">
-            <small class="text-length">{1}/{Len_Name}</small>
+            <input type="text" id="name" name="name" maxlength="{Len_Name}" bind:value={name}>
+            <small class="text-length">{name.length}/{Len_Name}</small>
         </label>
         <label>
             Mod authors' names
-            <input type="text" id="author" name="author" maxlength="{Len_Author}">
-            <small class="text-length">{1}/{Len_Author}</small>
+            <input type="text" id="author" name="author" maxlength="{Len_Author}" bind:value={author}>
+            <small class="text-length">{author.length}/{Len_Author}</small>
         </label>
         <label>
             Mod version
-            <input type="text" id="version" name="version" maxlength="{Len_Version}">
+            <input type="text" id="version" name="version" maxlength="{Len_Version}" bind:value={version}>
         </label>
         <label>
             Hardware Tycoon version

@@ -14,7 +14,7 @@
     let lastScroll = 0; //used to set scroll back to last position after editing
     let editingIndex: number | null = null;
     let editingPackage: App.Package | null = null;
-    let editingMeta = false;
+    let STATE: "editPackage" | "editMeta" | "preview" | null = null;
 
     let asideExpanded = false; //is mouse in aside bar
 
@@ -64,7 +64,7 @@
 
     function addPackage() {
         $MOD.packages.push(
-            {build: 0, cost: 100, img: "DIP14", maxClock: 5000, maxCore: "0", name: "", perf: 0, res: 2, stab: 0, time: 5, unit: 10}
+            {build: 0, cost: 1000, img: "DIP14", maxClock: 5000, maxCore: "0", name: "DIP14", perf: 0, res: 2, stab: 0, time: 5, unit: 10}
         )
         edit($MOD.packages.length - 1);
     }
@@ -90,10 +90,12 @@
     }
 </script>
 
-<h2 class="row-center">
-    <span>{$MOD.meta.name}</span>
-    <small>[{$MOD.meta.version}]</small>
-</h2>
+{#if $MOD}
+    <h2 class="row-center">
+        <span>{$MOD.meta?.name}</span>
+        <small>[{$MOD.meta?.version}]</small>
+    </h2>
+{/if}
 {#if error}
     <p class="error-p">{error}</p>
 {/if}
@@ -103,27 +105,20 @@
     <PackageEdit bind:editing={editingPackage} onCancel={exitEdit} onSave={onEditSave}/>
 {:else if $MOD}
     <div class="table-wrapper">
-        {#if editingIndex == null}
+        {#if !STATE}
             <aside class="column" class:aside-expand={asideExpanded} on:mouseenter={() => asideExpanded = true} on:mouseleave={() => asideExpanded = false}>
-                <ul>
+            <ul>
                 <li class="row">
-                    <button class="btn-none" on:click={() => goto("/")}>
-                        <iconify-icon class="btn-menu" icon="ic:baseline-arrow-back"/>
-                        <span class="btn-menu-text">Back to menu</span>
-                    </button>
-                </li>
-
-                <li class="row">
-                    <button class="btn-none" on:click={() => goto("/")}>
-                        <iconify-icon class="btn-menu" icon="ic:baseline-toc"/>
-                        <span class="btn-menu-text">Mod settings</span>
-                    </button>
-                </li>
-
-                <li class="row">
-                    <button class="btn-none" on:click={() => goto("/")}>
+                    <button class="btn-none" on:click={() => STATE = "preview"}>
                         <iconify-icon class="btn-menu" icon="ic:baseline-preview"/>
                         <span class="btn-menu-text">Preview R&D</span>
+                    </button>
+                </li>
+
+                <li class="row">
+                    <button class="btn-none" on:click={() => STATE = "editMeta"}>
+                        <iconify-icon class="btn-menu" icon="ic:baseline-toc"/>
+                        <span class="btn-menu-text">Mod settings</span>
                     </button>
                 </li>
 
@@ -133,62 +128,82 @@
                         <span class="btn-menu-text">Save mod file</span>
                     </button>
                 </li>
+
+                <li class="row">
+                    <button class="btn-none" on:click={() => goto("/")}>
+                        <iconify-icon class="btn-menu" icon="ic:baseline-arrow-back"/>
+                        <span class="btn-menu-text">Back to menu</span>
+                    </button>
+                </li>
             </ul>
             </aside>
         {/if}
 
-        <table class="package-table">
-            {#if $MOD.packages?.length}
-            <thead>
+        {#if STATE == "preview"}
+            <button on:click={() => STATE = null}>preview</button>
+            {:else if STATE == "editMeta"}
+            <button on:click={() => STATE = null}>meta</button>
+        {:else}
+            <table class="package-table">
+                {#if $MOD.packages?.length}
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th>Package</th>
+                        <th>Cost</th>
+                        <th>Time</th>
+                        <th>Unit</th>
+                        <th>Perf.</th>
+                        <th>Stability</th>
+                        <th>Build</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {#each $MOD.packages as pckg, id}
+                    <tr class="package-item" on:click={() => edit(id)}>
+                        <td style="font-size: 67.5%;">#{id + 1}</td>
+                        <td class="row"><img class="package-img" src="/package/{pckg.img}.png" alt=""></td>
+                        <td>{pckg.name}</td>
+                        <td>${formatNumber(Math.round(pckg.cost))}</td>
+                        <td>{pckg.time}D</td>
+                        <td>${Math.round(pckg.unit*100)/100}</td>
+                        <td>{formatNumber(pckg.perf)}</td>
+                        <td>{formatNumber(pckg.stab)}</td>
+                        <td>{formatNumber(pckg.build)}</td>
+                        <td>
+                            {#if pckg.res < 2}
+                            <iconify-icon icon="ic:baseline-science" title="Has associated research" style="opacity: 0.7;"/>
+                            {/if}
+                        </td>
+                        <td>
+                            <button class="btn-none btn-hover-highlight" on:click|stopPropagation={() => removePackage(id)}>
+                                <iconify-icon icon="ic:baseline-delete"/>
+                            </button>
+                        </td>
+                    </tr>
+                    {/each}
+                </tbody>
+                {/if}
                 <tr>
-                    <th></th>
-                    <th></th>
-                    <th>Package</th>
-                    <th>Cost</th>
-                    <th>Time</th>
-                    <th>Unit</th>
-                    <th>Perf.</th>
-                    <th>Stability</th>
-                    <th>Build</th>
-                    <th></th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {#each $MOD.packages as pckg, id}
-                <tr class="package-item" on:click={() => edit(id)}>
-                    <td style="font-size: 67.5%;">#{id + 1}</td>
-                    <td class="row"><img class="package-img" src="/package/{pckg.img}.png" alt=""></td>
-                    <td>{pckg.name}</td>
-                    <td>${formatNumber(Math.round(pckg.cost))}</td>
-                    <td>{pckg.time}D</td>
-                    <td>${Math.round(pckg.unit*100)/100}</td>
-                    <td>{formatNumber(pckg.perf)}</td>
-                    <td>{formatNumber(pckg.stab)}</td>
-                    <td>{formatNumber(pckg.build)}</td>
-                    <td>
-                        {#if pckg.res < 2}
-                        <iconify-icon icon="ic:baseline-science" title="Has associated research" style="opacity: 0.7;"/>
-                        {/if}
-                    </td>
-                    <td>
-                        <button class="btn-none btn-hover-highlight" on:click|stopPropagation={() => removePackage(id)}>
-                            <iconify-icon icon="ic:baseline-delete"/>
+                    <td class="package-add-item" colspan="11">
+                        <button type="button" on:click={addPackage}>
+                            <iconify-icon icon="ic:baseline-add-circle-outline"/>
                         </button>
                     </td>
                 </tr>
-                {/each}
-            </tbody>
-            {/if}
-            <tr>
-                <td class="package-add-item" colspan="11">
-                    <button type="button" on:click={addPackage}>
-                        <iconify-icon icon="ic:baseline-add-circle-outline"/>
-                    </button>
-                </td>
-            </tr>
-        </table>
+            </table>
+        {/if}
     </div>
+{:else}
+    <h1>Uh oh!</h1>
+    <p style="text-align: center;">
+        Looks like the mod was loaded incorrectly.<br>
+        Please refresh the editor.
+    </p>
+    <button class="btn-blue" on:click={() => goto('/')}>Back</button>
 {/if}
 </main>
 
@@ -277,21 +292,23 @@
         left: 0;
         align-items: flex-start;
         background-color: rgba(255, 255, 255, 0.5);
-        padding: 12px 0;
+        padding: 20px 0;
         max-width: 50vw;
         height: 100%;
         user-select: none;
+        box-shadow: 3px 0 2px rgba(0,0,0, 0.25);
+        transition: background 0.2s ease-out;
     }
     aside > ul {
+        position: sticky;
+        top: 20px;
         list-style: none;
         margin: 0;
         padding: 0;
-        position: sticky;
-        top: 0;
     }
     aside li {
         align-items: center;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         padding: 6px 12px;
     }
     aside li:hover {
@@ -300,6 +317,7 @@
     .btn-menu-text {
         display: none;
         margin-left: 6px;
+        font-size: 1.25rem;
     }
     .btn-menu:hover {
 	    background-color: rgba(255, 255, 255, 0.5);
@@ -317,5 +335,6 @@
     .error-p {
         position: sticky;
         top: 0;
+        margin: 0;
     }
 </style>

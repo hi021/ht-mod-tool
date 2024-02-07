@@ -45,7 +45,7 @@
 				"signingIdentity": null
 			},
 			"resources": [],
-			"shortDescription": "",
+			"shortDescription": "Handy tool for creating Hardware Tycoon mods",
 			"targets": "all",
 			"windows": {
 				"certificateThumbprint": null,
