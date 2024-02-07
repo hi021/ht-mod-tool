@@ -11,6 +11,8 @@
    let packageName: "DIP" | "PLCC" | "PGA" | string; //may only contain letters
    let numPins: number;
 
+   $: editing.name = packageName + " " + numPins;
+
    onMount(() => {
       const namePattern = new RegExp('(\\d+) pin ([A-Z]+)', 'i'); //e.g. 20 pin DIP
       const reg = namePattern.exec(editing.name);
@@ -29,7 +31,9 @@
    })
 </script>
 
-<div class="bg form row">
+<div class="form">
+   <h3>{editing.name}</h3>
+
    <div class="row">
       <label>
          Package type
@@ -136,27 +140,14 @@
    </div>
 
    <div class="row btn-row">
-      <button class="btn-none btn-menu btn-cancel" on:click={onCancel}>
+      <button class="btn-menu btn-menu-cancel" on:click={onCancel}>
          <iconify-icon icon="ic:baseline-clear"/>
       </button>
-      <button class="btn-none btn-menu btn-save" on:click={onSave}>
+      <button class="btn-menu btn-menu-confirm" on:click={onSave}>
          <iconify-icon icon="ic:baseline-check"/>
       </button>
    </div>
 </div>
 
 <style>
-   .btn-row {
-      justify-content: space-between;
-      margin-top: 14px;
-   }
-
-   .btn-cancel:hover,
-   .btn-cancel:focus {
-      background-color: rgba(211, 47, 47, 0.7);
-   }
-   .btn-save:hover,
-   .btn-save:focus {
-      background-color: rgba(85, 139, 47, 0.7);
-   }
 </style>

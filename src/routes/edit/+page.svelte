@@ -6,14 +6,16 @@
 	import type { Writable } from 'svelte/store';
     import { save } from '@tauri-apps/api/dialog';
     import { writeTextFile } from '@tauri-apps/api/fs';
+	import MetadataEdit from '$lib/MetadataEdit.svelte';
 
-    let error = "";
+    let error = ""; //message
     const MOD: Writable<App.ModData> = getContext('MOD');
     console.log($MOD);
     
     let lastScroll = 0; //used to set scroll back to last position after editing
     let editingIndex: number | null = null;
-    let editingPackage: App.Package | null = null;
+    let editingPackage: App.Package | null = null; //copy to allow cancelling
+    let editingMeta: App.ModMetadata | null = null; //copy to allow cancelling
     let STATE: "editPackage" | "editMeta" | "preview" | null = null;
 
     let asideExpanded = false; //is mouse in aside bar
@@ -21,19 +23,31 @@
     function exitEdit() {
         editingIndex = null;
         editingPackage = null;
+        editingMeta = null;
+        STATE = null;
         setTimeout(() => window.scroll({top: lastScroll}), 0); //gay hacky thing waiting for table to render
     }
 
-    function onEditSave() {
+    function onPackageEditSave() {
         if(editingIndex != null) $MOD.packages[editingIndex] = editingPackage as App.Package;
+        exitEdit();
+    }
+
+    function onMetaEditSave() {
+        if(editingMeta) $MOD.meta = editingMeta;
         exitEdit();
     }
 
     function edit(id: number) {
         lastScroll = window.scrollY;
-        console.log(lastScroll);
         editingIndex = id;
         editingPackage = JSON.parse(JSON.stringify($MOD.packages[id]));
+        STATE = "editPackage";
+    }
+
+    function editMeta() {
+        editingMeta = JSON.parse(JSON.stringify($MOD.meta));
+        STATE = "editMeta";
     }
     
     function findResearch(name: string) {
@@ -90,6 +104,7 @@
     }
 </script>
 
+<div class="main-container column">
 {#if $MOD}
     <h2 class="row-center">
         <span>{$MOD.meta?.name}</span>
@@ -100,50 +115,48 @@
     <p class="error-p">{error}</p>
 {/if}
 
-<main class="column">
-{#if editingPackage != null}
-    <PackageEdit bind:editing={editingPackage} onCancel={exitEdit} onSave={onEditSave}/>
+<main class="row flex-fill">
+{#if STATE == "editPackage" && editingPackage}
+    <PackageEdit bind:editing={editingPackage} onCancel={exitEdit} onSave={onPackageEditSave}/>
 {:else if $MOD}
-    <div class="table-wrapper">
-        {#if !STATE}
-            <aside class="column" class:aside-expand={asideExpanded} on:mouseenter={() => asideExpanded = true} on:mouseleave={() => asideExpanded = false}>
-            <ul>
-                <li class="row">
-                    <button class="btn-none" on:click={() => STATE = "preview"}>
-                        <iconify-icon class="btn-menu" icon="ic:baseline-preview"/>
-                        <span class="btn-menu-text">Preview R&D</span>
-                    </button>
-                </li>
-
-                <li class="row">
-                    <button class="btn-none" on:click={() => STATE = "editMeta"}>
-                        <iconify-icon class="btn-menu" icon="ic:baseline-toc"/>
-                        <span class="btn-menu-text">Mod settings</span>
-                    </button>
-                </li>
-
-                <li class="row">
-                    <button class="btn-none" on:click={saveMod}>
-                        <iconify-icon class="btn-menu" icon="ic:baseline-save"/>
-                        <span class="btn-menu-text">Save mod file</span>
-                    </button>
-                </li>
-
-                <li class="row">
-                    <button class="btn-none" on:click={() => goto("/")}>
-                        <iconify-icon class="btn-menu" icon="ic:baseline-arrow-back"/>
-                        <span class="btn-menu-text">Back to menu</span>
-                    </button>
-                </li>
-            </ul>
-            </aside>
-        {/if}
+    <div class="table-wrapper flex-fill">
+    <aside class="column" class:aside-expand={asideExpanded} on:mouseenter={() => asideExpanded = true} on:mouseleave={() => asideExpanded = false}>
+        <ul>
+            <li class="row" class:aside-active={STATE == "preview"}>
+                <button class="btn-none" on:click={() => STATE = "preview"}>
+                    <iconify-icon class="btn-menu" icon="ic:baseline-preview"/>
+                    <span class="btn-menu-text">Preview R&D</span>
+                </button>
+            </li>
+    
+            <li class="row" class:aside-active={STATE == "editMeta"}>
+                <button class="btn-none" on:click={editMeta}>
+                    <iconify-icon class="btn-menu" icon="ic:baseline-toc"/>
+                    <span class="btn-menu-text">Mod settings</span>
+                </button>
+            </li>
+    
+            <li class="row">
+                <button class="btn-none" on:click={saveMod}>
+                    <iconify-icon class="btn-menu" icon="ic:baseline-save"/>
+                    <span class="btn-menu-text">Save mod file</span>
+                </button>
+            </li>
+    
+            <li class="row">
+                <button class="btn-none" on:click={() => goto("/")}>
+                    <iconify-icon class="btn-menu" icon="ic:baseline-arrow-back"/>
+                    <span class="btn-menu-text">Back to menu</span>
+                </button>
+            </li>
+        </ul>
+        </aside>
 
         {#if STATE == "preview"}
             <button on:click={() => STATE = null}>preview</button>
-            {:else if STATE == "editMeta"}
-            <button on:click={() => STATE = null}>meta</button>
-        {:else}
+        {:else if STATE == "editMeta" && editingMeta}
+            <MetadataEdit bind:meta={editingMeta} onCancel={exitEdit} onSave={onMetaEditSave}></MetadataEdit>
+        {:else if STATE != "editPackage"}
             <table class="package-table">
                 {#if $MOD.packages?.length}
                 <thead>
@@ -198,15 +211,17 @@
         {/if}
     </div>
 {:else}
+<div class="column" style="margin: auto;">
     <h1>Uh oh!</h1>
     <p style="text-align: center;">
         Looks like the mod was loaded incorrectly.<br>
-        Please refresh the editor.
+        Please reload the editor.
     </p>
     <button class="btn-blue" on:click={() => goto('/')}>Back</button>
+</div>
 {/if}
 </main>
-
+</div>
 
 <style>
     h2 {
@@ -218,6 +233,9 @@
         margin-left: 10px;
     }
     
+    .main-container {
+        min-height: 100vh;
+    }
     main {
         min-height: auto;
     }
@@ -291,18 +309,18 @@
         top: 0;
         left: 0;
         align-items: flex-start;
+        padding-top: 20px;
         background-color: rgba(255, 255, 255, 0.5);
-        padding: 20px 0;
-        max-width: 50vw;
         height: 100%;
+        max-width: 50vw;
         user-select: none;
         box-shadow: 3px 0 2px rgba(0,0,0, 0.25);
         transition: background 0.2s ease-out;
     }
     aside > ul {
+        list-style: none;
         position: sticky;
         top: 20px;
-        list-style: none;
         margin: 0;
         padding: 0;
     }
@@ -312,6 +330,9 @@
         padding: 6px 12px;
     }
     aside li:hover {
+        background-color: var(--color-ht-secondary);
+    }
+    .aside-active {
         background-color: var(--color-ht-secondary);
     }
     .btn-menu-text {
