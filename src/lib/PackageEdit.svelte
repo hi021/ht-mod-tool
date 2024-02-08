@@ -2,6 +2,7 @@
 	import { onMount } from "svelte";
 
    export let editing: App.Package;
+   export let research: App.Research;
    export let onSave: () => void;
    export let onCancel: () => void;
 
@@ -24,11 +25,17 @@
          numPins = 14;
       } else {
          packageName = reg[2].slice(0, Len_PackageName);
+         console.log(packageName);//
          if(packageName == "DIP" || packageName == "PLCC" || packageName == "PGA") packageType = packageName;
          else packageType = "Custom";
          numPins = Math.min(Math.max(parseInt(reg[1]), 2), 9999); //2 - 9999
       }
    })
+
+   function onResearchedChange(e: Event) {
+      if((e.target as HTMLInputElement).checked) editing.res = 2;
+      else editing.res = 1;
+   } 
 </script>
 
 <div class="form">
@@ -77,7 +84,7 @@
       <img class="unselectable" alt="Package" src="/package/{editing.img}.png">
    </div>
 
-   <label>
+   <label class="row">
       Max clock
       <input type="number" min="200" max="1000000000000" step="1" placeholder="in kHz" bind:value={editing.maxClock}>
       <small>
@@ -88,10 +95,6 @@
             {Math.floor(editing.maxClock/10000)/100} GHz
          {/if}
       </small>
-   </label>
-   <label>
-      Researched
-      <input type="checkbox">
    </label>
    <label>
       Supported core
@@ -139,6 +142,39 @@
       </div>
    </div>
 
+   <label>
+      Researched
+      <input type="checkbox" checked={editing.res >= 2} on:change={onResearchedChange}>
+   </label>
+   {#if editing.res < 2}
+      <div class="column">
+         <label title="Fixed one-time cost at the beginning of the research">
+            Research cost
+            <input type="number" min="0" max="1000000000" step="1" placeholder="in $" bind:value={research.cost}>
+         </label>
+         <label title="Research points necessary to finish researching the technology">
+            Research points
+            <input type="number" min="0" max="1000000" step="1" bind:value={research.resPoints}>
+         </label>
+         <label title="CPU experience required to unlock the research">
+            Required exp
+            <input type="number" min="0" max="1000000" step="1" bind:value={research.xp}>
+         </label>
+         <label title="Earliest year the package is possible to research">
+            Unlock year
+            <input type="number" min="0" max="10000" step="1" bind:value={research.year}>
+         </label>
+         <label title="R&D Position, where 1 = width of one research box">
+            X position
+            <input type="number" min="0" max="10000" step="0.01" bind:value={research.x}>
+         </label>
+         <label title="R&D Position, where 1 = width of one research box">
+            Y position
+            <input type="number" min="0" max="10000" step="0.01" bind:value={research.y}>
+         </label>
+      </div>      
+   {/if}
+
    <div class="row btn-row">
       <button class="btn-menu btn-menu-cancel" on:click={onCancel}>
          <iconify-icon icon="ic:baseline-clear"/>
@@ -150,4 +186,8 @@
 </div>
 
 <style>
+   h3 {
+      text-align: center;
+      font-size: 2rem;
+   }
 </style>

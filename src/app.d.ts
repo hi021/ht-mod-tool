@@ -45,7 +45,7 @@ declare global {
 			year: number; //min unlock year
 			res: number; //whether researched (0 - locked, 1 - unlocked, 2 - researched)
 			x: number; //position on R&D screen
-			reqRes: number; //whether required tech is researched(?)
+			reqRes: number; //whether required tech is researched(? unused)
 			y: number; //position on R&D screen
 		}
 	}
