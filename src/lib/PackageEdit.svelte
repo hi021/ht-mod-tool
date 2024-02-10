@@ -1,8 +1,6 @@
 <script lang="ts">
-	import { onMount } from "svelte";
-
    export let editing: App.Package;
-   export let research: App.Research;
+   export let research: App.Research | null;
    export let onSave: () => void;
    export let onCancel: () => void;
 
@@ -13,28 +11,30 @@
    let numPins: number;
 
    $: editing.name = packageName + " " + numPins;
+   const namePattern = new RegExp('(\\d+) pin ([A-Z]+)', 'i'); //e.g. 20 pin DIP
+   const reg = namePattern.exec(editing.name);
 
-   onMount(() => {
-      const namePattern = new RegExp('(\\d+) pin ([A-Z]+)', 'i'); //e.g. 20 pin DIP
-      const reg = namePattern.exec(editing.name);
-
-      if(!reg?.[0]) {
-         //invalid name
-         editing.name = "14 pin DIP";
-         packageName = packageType = "DIP";
-         numPins = 14;
-      } else {
-         packageName = reg[2].slice(0, Len_PackageName);
-         console.log(packageName);//
-         if(packageName == "DIP" || packageName == "PLCC" || packageName == "PGA") packageType = packageName;
-         else packageType = "Custom";
-         numPins = Math.min(Math.max(parseInt(reg[1]), 2), 9999); //2 - 9999
-      }
-   })
+   if(!reg?.[0]) {
+      //invalid name
+      editing.name = "14 pin DIP";
+      packageName = packageType = "DIP";
+      numPins = 14;
+   } else {
+      packageName = reg[2].slice(0, Len_PackageName);
+      if(packageName == "DIP" || packageName == "PLCC" || packageName == "PGA") packageType = packageName;
+      else packageType = "Custom";
+      numPins = Math.min(Math.max(parseInt(reg[1]), 2), 9999); //2 - 9999
+   }
 
    function onResearchedChange(e: Event) {
-      if((e.target as HTMLInputElement).checked) editing.res = 2;
-      else editing.res = 1;
+      if((e.target as HTMLInputElement).checked) {
+         editing.res = 1; //researched
+      }
+      else {
+         if(!research) research =
+            {category: packageType, cost: 5000, name: packageName, reqRes: 1, res: 0, resPoints: 100, tab: "CPU", x: 0, xp: 100, y: 0, year: 1980}
+         editing.res = 0;
+      }
    } 
 </script>
 
@@ -44,14 +44,14 @@
    <div class="row">
       <label>
          Package type
-         <select bind:value={packageType}>
+         <select bind:value={packageType} on:change={() => {if(packageType == "Custom") return; packageName = packageType;}}>
             <option>DIP</option>
             <option>PLCC</option>
             <option>PGA</option>
             <option>Custom</option>
          </select>
          {#if packageType == "Custom"}
-            <input type="text" name="customPackageName" maxlength={Len_PackageName} bind:value={packageName}>
+            <input type="text" name="customPackageName" maxlength={Len_PackageName} bind:value={packageName} style="margin-top: 4px;">
          {/if}
       </label>
       <label>
@@ -84,29 +84,35 @@
       <img class="unselectable" alt="Package" src="/package/{editing.img}.png">
    </div>
 
-   <label class="row">
-      Max clock
-      <input type="number" min="200" max="1000000000000" step="1" placeholder="in kHz" bind:value={editing.maxClock}>
-      <small>
-         {#if editing.maxClock < 100000000}
-            {Math.floor(editing.maxClock/10)/100} MHz
-         {/if}
-         {#if editing.maxClock > 100000}
-            {Math.floor(editing.maxClock/10000)/100} GHz
-         {/if}
-      </small>
-   </label>
-   <label>
-      Supported core
-      <select bind:value={editing.maxCore}>
-         <option value="0">Single-core</option>
-         <option value="1">Experimental dual-core</option>
-         <option value="2">Basic dual-core</option>
-         <option value="3">Dual-core</option>
-         <option value="4">Triple-core</option>
-         <option value="5">Quad-core</option>
-      </select>
-   </label>
+   <div class="row">
+      <label class="row">
+         Max clock
+         <input type="number" min="200" max="1000000000000" step="1" placeholder="in kHz" bind:value={editing.maxClock}>
+         <small>
+            {#if editing.maxClock < 100000000}
+               {Math.floor(editing.maxClock/10)/100} MHz
+            {/if}
+            {#if editing.maxClock > 100000}
+               {#if editing.maxClock >= 1000000000000}
+                  TOO MUCH
+               {:else}
+                  {Math.floor(editing.maxClock/10000)/100} GHz
+               {/if}
+            {/if}
+         </small>
+      </label>
+      <label>
+         Supported core
+         <select bind:value={editing.maxCore}>
+            <option value="0">Single-core</option>
+            <option value="1">Experimental dual-core</option>
+            <option value="2">Basic dual-core</option>
+            <option value="3">Dual-core</option>
+            <option value="4">Triple-core</option>
+            <option value="5">Quad-core</option>
+         </select>
+      </label>
+   </div>
 
    <div class="row">
       <div class="column">
@@ -144,9 +150,9 @@
 
    <label>
       Researched
-      <input type="checkbox" checked={editing.res >= 2} on:change={onResearchedChange}>
+      <input type="checkbox" checked={editing.res >= 1} on:change={onResearchedChange}>
    </label>
-   {#if editing.res < 2}
+   {#if research}
       <div class="column">
          <label title="Fixed one-time cost at the beginning of the research">
             Research cost
@@ -172,7 +178,7 @@
             Y position
             <input type="number" min="0" max="10000" step="0.01" bind:value={research.y}>
          </label>
-      </div>      
+      </div>
    {/if}
 
    <div class="row btn-row">
@@ -186,8 +192,19 @@
 </div>
 
 <style>
+   .form {
+      align-items: center;
+   }
+
    h3 {
       text-align: center;
       font-size: 2rem;
+      margin-top: 0;
+   }
+
+   label {
+      display: flex;
+      flex-direction: column;
+      margin: 4px;
    }
 </style>

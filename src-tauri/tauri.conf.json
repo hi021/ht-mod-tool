@@ -62,10 +62,10 @@
 		"windows": [
 			{
 				"fullscreen": false,
-				"height": 680,
+				"height": 720,
 				"resizable": true,
 				"title": "HT Mod Tool",
-				"width": 1024
+				"width": 1280
 			}
 		]
 	}

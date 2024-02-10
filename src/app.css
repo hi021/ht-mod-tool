@@ -70,11 +70,13 @@ textarea {
 	border-radius: 0.25rem;
 	font-weight: 400;
 	background-color: #fff;
-	color: var(--color-darkest);
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
-	border: 1px solid #ced4da;
+	border: 1px solid #ddd;
 	transition: border-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+}
+select {
+	padding: 3px 4px;
 }
 /* can't use :is() in global sheets;; */
 input:focus,
@@ -185,6 +187,46 @@ button[disabled] {
 	background-color: hsl(var(--color-yellow-h));
 }
 
+/* SCROLLBAR */
+.scrollbar-dark,
+.scrollbar-small {
+	scrollbar-color: #222 var(--color-dark);
+}
+/* apparently something must be in here for other styles to work */
+.scrollbar-dark::-webkit-scrollbar,
+.scrollbar-small::-webkit-scrollbar {
+	display: initial;
+}
+.scrollbar-dark::-webkit-scrollbar-track {
+	background: var(--color-dark);
+}
+.scrollbar-dark::-webkit-scrollbar-thumb {
+	background: #222;
+}
+.scrollbar-dark::-webkit-scrollbar-thumb:hover {
+	background: #333;
+}
+.scrollbar-dark::-webkit-scrollbar-button,
+.scrollbar-small::-webkit-scrollbar-button {
+	display: none;
+}
+
+.scrollbar-small::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+.scrollbar-small::-webkit-scrollbar-track {
+	background: rgba(0, 0, 0, 0.2);
+	border-radius: 999px;
+}
+.scrollbar-small::-webkit-scrollbar-thumb {
+	background: rgba(0, 0, 0, 0.3);
+	border-radius: 999px;
+}
+.scrollbar-small::-webkit-scrollbar-thumb:hover {
+	background: rgba(0, 0, 0, 0.4);
+}
+
 /* ELEMENTS */
 fieldset {
 	border: 1px solid rgba(0, 0, 0, 0.25);
@@ -277,6 +319,7 @@ form label {
 .btn-row {
 	justify-content: space-between;
 	margin-top: 14px;
+	width: 100%;
 }
 
 .unselectable {

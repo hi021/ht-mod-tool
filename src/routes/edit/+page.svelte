@@ -55,7 +55,7 @@
         lastScroll = window.scrollY;
         editingIndex = id;
         editingPackage = JSON.parse(JSON.stringify($MOD.packages[id]));
-        if(editingPackage && (editingPackage.res ?? -1) >= 2) editingResearch = JSON.parse(JSON.stringify(findResearch(editingPackage.name)?.res ?? null));
+        if(editingPackage && (editingPackage.res ?? -1) >= 1) editingResearch = JSON.parse(JSON.stringify(findResearch(editingPackage.name)?.res ?? null));
         STATE = "editPackage";
     }
 
@@ -135,7 +135,7 @@
     }
 </script>
 
-<div class="main-container column">
+<div class="main-container column scrollbar-dark">
 {#if $MOD}
     <h2 class="row-center">
         <span>{$MOD.meta?.name}</span>
@@ -147,7 +147,7 @@
 {/if}
 
 <main class="row flex-fill">
-{#if STATE == "editPackage" && editingPackage && editingResearch}
+{#if STATE == "editPackage" && editingPackage}
     <PackageEdit bind:editing={editingPackage} bind:research={editingResearch} onCancel={exitEdit} onSave={onPackageEditSave}/>
 {:else if $MOD}
     <div class="table-wrapper flex-fill">
@@ -186,9 +186,9 @@
         {#if STATE == "preview"}
             <button on:click={() => STATE = null}>preview</button>
         {:else if STATE == "editMeta" && editingMeta}
-            <MetadataEdit bind:meta={editingMeta} onCancel={exitEdit} onSave={onMetaEditSave}></MetadataEdit>
+            <MetadataEdit bind:meta={editingMeta} onCancel={exitEdit} onSave={onMetaEditSave}/>
         {:else if STATE != "editPackage"}
-            <table class="package-table">
+            <table class="package-table" style="{$MOD.packages.length ? "" : "width: 55%; --radius: 0;"}">
                 {#if $MOD.packages?.length}
                 <thead>
                     <tr>
@@ -218,7 +218,7 @@
                         <td>{formatNumber(pckg.stab)}</td>
                         <td>{formatNumber(pckg.build)}</td>
                         <td>
-                            {#if pckg.res < 2}
+                            {#if pckg.res < 1}
                             <iconify-icon icon="ic:baseline-science" title="Has associated research" style="opacity: 0.7;"/>
                             {/if}
                         </td>
@@ -233,7 +233,7 @@
                 {/if}
                 <tr>
                     <td class="package-add-item" colspan="11">
-                        <button type="button" on:click={addPackage}>
+                        <button type="button" on:click={addPackage} style="{$MOD.packages.length ? "" : "margin-top: 0;"}">
                             <iconify-icon icon="ic:baseline-add-circle-outline"/>
                         </button>
                     </td>
@@ -329,7 +329,7 @@
         padding: 6px;
         border: none;
         border-radius: 0;
-        margin-top: 10px;
+        margin-top: 8px;
     }
     .package-add-item > button:hover {
         background-color: rgba(174, 213, 129, 1);
@@ -343,10 +343,9 @@
         padding-top: 20px;
         background-color: rgba(255, 255, 255, 0.5);
         height: 100%;
-        max-width: 3.5rem;
         user-select: none;
         box-shadow: 3px 0 2px rgba(0,0,0, 0.25);
-        transition: background 0.2s ease-out, max-width 0.2s ease-out;
+        transition: background 0.2s ease-out;
     }
     aside > ul {
         list-style: none;
@@ -363,26 +362,32 @@
     aside li:hover {
         background-color: var(--color-ht-secondary);
     }
+    aside li > button:focus {
+        box-shadow: none;
+    }
     .aside-active {
         background-color: var(--color-ht-secondary);
     }
     .btn-menu-text {
-        display: none;
+        max-width: 0;
         margin-left: 6px;
         font-size: 1.25rem;
+        text-wrap: nowrap;
+        line-height: 1;
+        overflow: hidden;
+        transition: max-width 0.2s ease-out;
     }
     .btn-menu:hover {
 	    background-color: rgba(255, 255, 255, 0.5);
     }
     .aside-expand {
-        max-width: 50vw;
         background-color: rgba(255, 255, 255, 0.8);
     }
     .aside-expand .btn-menu {
         background-color: rgba(255, 255, 255, 1);
     }
     .aside-expand .btn-menu-text {
-        display: inline-block;
+        max-width: 16ch;
     }
 
     .error-p {
