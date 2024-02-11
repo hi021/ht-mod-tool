@@ -126,7 +126,7 @@ export function findResearch(research: App.Research[] | undefined, researchName:
 }
 
 export function parsePackageName(name: string) {
-	const namePattern = new RegExp("(\\d+) pin ([A-Z]+)", "i"); //e.g. 20 pin DIP
+	const namePattern = new RegExp("(\\d+) pin ([A-Z)()]+)", "i"); //e.g. 20 pin DIP
 	const reg = namePattern.exec(name);
 	if (!reg?.[0]) return null; //invalid name
 

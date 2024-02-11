@@ -153,28 +153,28 @@
     <aside class="column" class:aside-expand={asideExpanded} on:mouseenter={() => asideExpanded = true} on:mouseleave={() => asideExpanded = false}>
         <ul>
             <li class="row">
-                <button class="btn-none" on:click={() => STATE = STATE == "preview" ? null : "preview"}>
+                <button class="aside-btn btn-none" on:click={() => STATE = STATE == "preview" ? null : "preview"}>
                     <iconify-icon class="btn-menu" class:aside-active={STATE == "preview"} icon="ic:baseline-preview"/>
                     <span class="btn-menu-text">Preview R&D</span>
                 </button>
             </li>
     
             <li class="row">
-                <button class="btn-none" on:click={editMeta}>
+                <button class="aside-btn btn-none" on:click={editMeta}>
                     <iconify-icon class="btn-menu" class:aside-active={STATE == "editMeta"} icon="ic:baseline-toc"/>
                     <span class="btn-menu-text">Mod settings</span>
                 </button>
             </li>
     
             <li class="row">
-                <button class="btn-none" on:click={saveMod}>
+                <button class="aside-btn btn-none" on:click={saveMod}>
                     <iconify-icon class="btn-menu" icon="ic:baseline-save"/>
                     <span class="btn-menu-text">Save mod file</span>
                 </button>
             </li>
     
             <li class="row">
-                <button class="btn-none" on:click={() => goto("/")}>
+                <button class="aside-btn btn-none" on:click={() => goto("/")}>
                     <iconify-icon class="btn-menu" icon="ic:baseline-arrow-back"/>
                     <span class="btn-menu-text">Back to menu</span>
                 </button>
@@ -354,16 +354,17 @@
         position: sticky;
         top: 20px;
     }
-    aside li {
-        align-items: center;
-        margin-bottom: 8px;
+    .aside-btn {
+        width: 100%;
         padding: 6px 12px;
+        margin-bottom: 8px;
+        border-radius: 0;
+        justify-content: left;
     }
-    aside li:hover {
-        background-color: var(--color-ht-secondary);
-    }
-    aside li > button:focus {
+    .aside-btn:focus,
+    .aside-btn:hover {
         box-shadow: none;
+        background-color: var(--color-ht-secondary);
     }
     .aside-active {
         background-color: var(--color-ht-secondary);
@@ -373,12 +374,9 @@
         margin-left: 6px;
         font-size: 1.25rem;
         text-wrap: nowrap;
-        line-height: 1;
+        line-height: 2;
         overflow: hidden;
         transition: max-width 0.2s ease-out;
-    }
-    .btn-menu:hover {
-	    background-color: rgba(255, 255, 255, 0.5);
     }
     .aside-expand {
         background-color: rgba(255, 255, 255, 0.8);

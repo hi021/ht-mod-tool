@@ -31,12 +31,14 @@
 
 <style>
    .bg {
-      overflow: auto;
-      border-radius: 6px;
-	   background-color: rgba(255, 255, 255, 0.3);
+      position: relative;
       width: 78vw;
       height: 80vh;
       padding: 24px;
       margin: auto;
+      overflow: auto;
+      border-radius: 6px;
+	   background-color: rgba(255, 255, 255, 0.42);
+      scroll-behavior: smooth;
    }
 </style>
