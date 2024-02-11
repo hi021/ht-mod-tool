@@ -1,3 +1,7 @@
+export const LEN_NAME = 30; //max lengths
+export const LEN_AUTHOR = 24;
+export const LEN_VERSION = 10;
+
 export function formatNumber(num: number | string, token = " "): string {
 	return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, token);
 }
@@ -109,4 +113,28 @@ export function parseMod(modLines: string[]): App.ModData | null {
 	const research = parseResearch(modLines, packages.lastLine + 1);
 
 	return { meta, packages: packages.packages, research: research?.research };
+}
+
+export function findResearch(research: App.Research[] | undefined, researchName: string) {
+	if (!research?.length) return null;
+
+	const id = research.findIndex((a) => a.name === researchName);
+	if (id < 0) return null;
+
+	const res = research[id];
+	return { id, res };
+}
+
+export function parsePackageName(name: string) {
+	const namePattern = new RegExp("(\\d+) pin ([A-Z]+)", "i"); //e.g. 20 pin DIP
+	const reg = namePattern.exec(name);
+	if (!reg?.[0]) return null; //invalid name
+
+	let packageType: "DIP" | "PLCC" | "PGA" | "Custom";
+	const packageName = reg[2].slice(0, 10);
+	if (packageName == "DIP" || packageName == "PLCC" || packageName == "PGA") packageType = packageName;
+	else packageType = "Custom";
+	const numPins = Math.min(Math.max(parseInt(reg[1]), 2), 9999); //2 - 9999
+
+	return { packageName, packageType, numPins };
 }

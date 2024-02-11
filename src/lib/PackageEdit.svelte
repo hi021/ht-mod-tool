@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { parsePackageName } from "./util";
+
    export let editing: App.Package;
    export let research: App.Research | null;
    export let onSave: () => void;
@@ -10,30 +12,28 @@
    let packageName: "DIP" | "PLCC" | "PGA" | string; //may only contain letters
    let numPins: number;
 
-   $: editing.name = packageName + " " + numPins;
-   const namePattern = new RegExp('(\\d+) pin ([A-Z]+)', 'i'); //e.g. 20 pin DIP
-   const reg = namePattern.exec(editing.name);
+   //Parse package name and pins
+   $: editing.name = numPins + " pin " + packageName;
 
-   if(!reg?.[0]) {
-      //invalid name
+   const parsedName = parsePackageName(editing.name);
+   if(!parsedName) {
       editing.name = "14 pin DIP";
       packageName = packageType = "DIP";
       numPins = 14;
    } else {
-      packageName = reg[2].slice(0, Len_PackageName);
-      if(packageName == "DIP" || packageName == "PLCC" || packageName == "PGA") packageType = packageName;
-      else packageType = "Custom";
-      numPins = Math.min(Math.max(parseInt(reg[1]), 2), 9999); //2 - 9999
+      packageName = parsedName.packageName;
+      packageType = parsedName.packageType
+      numPins = parsedName.numPins;
    }
 
    function onResearchedChange(e: Event) {
       if((e.target as HTMLInputElement).checked) {
-         editing.res = 1; //researched
+         editing.res = 1; //no research, already unlocked
       }
       else {
          if(!research) research =
             {category: packageType, cost: 5000, name: packageName, reqRes: 1, res: 0, resPoints: 100, tab: "CPU", x: 0, xp: 100, y: 0, year: 1980}
-         editing.res = 0;
+         editing.res = 0; //needs research
       }
    } 
 </script>
@@ -41,63 +41,67 @@
 <div class="form">
    <h3>{editing.name}</h3>
 
-   <div class="row">
-      <label>
-         Package type
-         <select bind:value={packageType} on:change={() => {if(packageType == "Custom") return; packageName = packageType;}}>
-            <option>DIP</option>
-            <option>PLCC</option>
-            <option>PGA</option>
-            <option>Custom</option>
-         </select>
-         {#if packageType == "Custom"}
-            <input type="text" name="customPackageName" maxlength={Len_PackageName} bind:value={packageName} style="margin-top: 4px;">
-         {/if}
-      </label>
-      <label>
-         Num pins
-         <input type="number" min="2" max="9999" step="1" placeholder="2-9999" bind:value={numPins}>
-      </label>
-      <label>
-         Image
-         <select bind:value={editing.img}>
-            <option>DIP14</option>
-            <option>DIP18</option>
-            <option>DIP24</option>
-            <option>DIP32</option>
-            <option>DIP40</option>
-            <option>DIP48</option>
-            <option>DIP56</option>
-            <option>PLCC24</option>
-            <option>PLCC32</option>
-            <option>PLCC48</option>
-            <option>PLCC56</option>
-            <option>PLCC64</option>
-            <option>PGA</option>
-            <option value="PGAGold">PGA Gold</option>
-            <option value="PGANew">PGA New</option>
-            <option value="PGAModern">PGA Modern</option>
-            <option>LGA</option>
-         </select>
-      </label>
+   <div class="row" style="justify-content: space-around; width: 100%;">
+      <div class="row">
+         <label>
+            Package type
+            <select bind:value={packageType} on:change={() => {if(packageType == "Custom") return; packageName = packageType;}}>
+               <option>DIP</option>
+               <option>PLCC</option>
+               <option>PGA</option>
+               <option>Custom</option>
+            </select>
 
-      <img class="unselectable" alt="Package" src="/package/{editing.img}.png">
+            <input type="text" name="customPackageName" maxlength={Len_PackageName} spellcheck="false"
+                  bind:value={packageName} style="margin-top: 4px; visibility: {packageType == "Custom" ? "visible" : "hidden"};">
+         </label>
+         <label>
+            Pin count
+            <input type="number" min="2" max="9999" step="1" placeholder="2-9999" bind:value={numPins}>
+         </label>
+      </div>
+
+      <div class="row">
+         <label>
+            Image
+            <select bind:value={editing.img}>
+               <option>DIP14</option>
+               <option>DIP18</option>
+               <option>DIP24</option>
+               <option>DIP32</option>
+               <option>DIP40</option>
+               <option>DIP48</option>
+               <option>DIP56</option>
+               <option>PLCC24</option>
+               <option>PLCC32</option>
+               <option>PLCC48</option>
+               <option>PLCC56</option>
+               <option>PLCC64</option>
+               <option>PGA</option>
+               <option value="PGAGold">PGA Gold</option>
+               <option value="PGANew">PGA New</option>
+               <option value="PGAModern">PGA Modern</option>
+               <option>LGA</option>
+            </select>
+         </label>
+         <img class="unselectable" alt="Package" src="/package/{editing.img}.png">
+      </div>
    </div>
 
-   <div class="row">
-      <label class="row">
+   <fieldset class="row">
+   <legend>Limitations</legend>
+      <label>
          Max clock
          <input type="number" min="200" max="1000000000000" step="1" placeholder="in kHz" bind:value={editing.maxClock}>
          <small>
+            {#if editing.maxClock >= 1000000000000}
+               TOO MUCH
+            {:else if editing.maxClock > 100000}
+               {Math.floor(editing.maxClock/10000)/100} GHz
+            {/if}
+
             {#if editing.maxClock < 100000000}
                {Math.floor(editing.maxClock/10)/100} MHz
-            {/if}
-            {#if editing.maxClock > 100000}
-               {#if editing.maxClock >= 1000000000000}
-                  TOO MUCH
-               {:else}
-                  {Math.floor(editing.maxClock/10000)/100} GHz
-               {/if}
             {/if}
          </small>
       </label>
@@ -112,24 +116,11 @@
             <option value="5">Quad-core</option>
          </select>
       </label>
-   </div>
+   </fieldset>
 
    <div class="row">
-      <div class="column">
-         <label>
-            Design cost
-            <input type="number" min="0" max="1000000000" step="1" placeholder="in $" bind:value={editing.cost}>
-         </label>
-         <label>
-            Design time
-            <input type="number" min="0" step="1" max="9999" placeholder="in days" bind:value={editing.time}>
-         </label>
-         <label>
-            Unit cost
-            <input type="number" min="0" step="0.01" max="1000" placeholder="in $" bind:value={editing.unit}>
-         </label>
-      </div>
-      <div class="column">
+      <fieldset class="column">
+      <legend>Stats</legend>
          <label>
             Performance
             <input type="number" step="0.01" bind:value={editing.perf}>
@@ -144,42 +135,68 @@
          </label>
 
          <span>{Math.floor((editing.perf + editing.stab + editing.build) * 100)/100} total</span>
+      </fieldset>
+
+      <fieldset class="column">
+      <legend>Basics</legend>
+         <label>
+            Design cost
+            <input type="number" min="0" max="1000000000" step="1" placeholder="in $" bind:value={editing.cost}>
+         </label>
+         <label>
+            Design time
+            <input type="number" min="0" step="1" max="9999" placeholder="in days" bind:value={editing.time}>
+         </label>
+         <label>
+            Unit cost
+            <input type="number" min="0" step="0.01" max="1000" placeholder="in $" bind:value={editing.unit}>
+         </label>
+
          <span><strong>{Math.round((editing.perf + editing.stab + editing.build) / editing.unit*100)/100}</strong> score/cost</span>
+      </fieldset>
+
+      <div class="column">
+         <label class="row-center" style="margin-left: 10ch;">
+            Researched
+            <input type="checkbox" checked={editing.res >= 1} on:change={onResearchedChange}>
+         </label>
+         {#if research && editing.res < 1}
+            <fieldset class="column">
+            <legend>Research</legend>
+               <div class="row">
+                  <label title="Fixed one-time cost at the beginning of the research">
+                     Research cost
+                     <input type="number" min="0" max="1000000000" step="1" placeholder="in $" bind:value={research.cost}>
+                  </label>
+                  <label title="Research points necessary to finish researching the technology">
+                     Research points
+                     <input type="number" min="0" max="1000000" step="1" bind:value={research.resPoints}>
+                  </label>
+               </div>
+               <div class="row">
+                  <label title="CPU experience required to unlock the research">
+                     Required exp
+                     <input type="number" min="0" max="1000000" step="1" bind:value={research.xp}>
+                  </label>
+                  <label title="Earliest year the package is possible to research">
+                     Unlock year
+                     <input type="number" min="0" max="10000" step="1" bind:value={research.year}>
+                  </label>
+               </div>
+               <div class="row">
+                  <label title="R&D Position, where 1 = width of one research box">
+                     X position
+                     <input type="number" min="0" max="200" step="0.01" bind:value={research.x}>
+                  </label>
+                  <label title="R&D Position, where 1 = width of one research box">
+                     Y position
+                     <input type="number" min="0" max="19" step="0.01" bind:value={research.y}>
+                  </label>
+               </div>
+            </fieldset>
+         {/if}
       </div>
    </div>
-
-   <label>
-      Researched
-      <input type="checkbox" checked={editing.res >= 1} on:change={onResearchedChange}>
-   </label>
-   {#if research}
-      <div class="column">
-         <label title="Fixed one-time cost at the beginning of the research">
-            Research cost
-            <input type="number" min="0" max="1000000000" step="1" placeholder="in $" bind:value={research.cost}>
-         </label>
-         <label title="Research points necessary to finish researching the technology">
-            Research points
-            <input type="number" min="0" max="1000000" step="1" bind:value={research.resPoints}>
-         </label>
-         <label title="CPU experience required to unlock the research">
-            Required exp
-            <input type="number" min="0" max="1000000" step="1" bind:value={research.xp}>
-         </label>
-         <label title="Earliest year the package is possible to research">
-            Unlock year
-            <input type="number" min="0" max="10000" step="1" bind:value={research.year}>
-         </label>
-         <label title="R&D Position, where 1 = width of one research box">
-            X position
-            <input type="number" min="0" max="10000" step="0.01" bind:value={research.x}>
-         </label>
-         <label title="R&D Position, where 1 = width of one research box">
-            Y position
-            <input type="number" min="0" max="10000" step="0.01" bind:value={research.y}>
-         </label>
-      </div>
-   {/if}
 
    <div class="row btn-row">
       <button class="btn-menu btn-menu-cancel" on:click={onCancel}>
@@ -194,6 +211,7 @@
 <style>
    .form {
       align-items: center;
+      width: 82%;
    }
 
    h3 {
@@ -203,8 +221,17 @@
    }
 
    label {
+      margin: 4px;
+   }
+   label:not(.row, .row-center) {
       display: flex;
       flex-direction: column;
-      margin: 4px;
+   }
+
+   img {
+      padding: 3px;
+      margin: 3px;
+      background-color: rgba(255,255,255, 0.2);
+      border-radius: 2px;
    }
 </style>

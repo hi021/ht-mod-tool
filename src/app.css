@@ -187,6 +187,13 @@ button[disabled] {
 	background-color: hsl(var(--color-yellow-h));
 }
 
+input[type="checkbox"] {
+	accent-color: var(--color-ht-primary);
+	margin: 0 3px;
+	width: 1.25em;
+	height: 1.25em;
+}
+
 /* SCROLLBAR */
 .scrollbar-dark,
 .scrollbar-small {
@@ -284,10 +291,16 @@ h2 {
 	border-radius: 6px;
 	background-color: rgba(255, 255, 255, 0.3);
 }
-form label {
+.form label {
 	display: flex;
 	flex-direction: column;
 	margin-bottom: 12px;
+}
+.text-length {
+	margin-left: auto;
+}
+.label-long {
+	min-width: 70%;
 }
 
 .error-p {

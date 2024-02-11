@@ -30,12 +30,12 @@ declare global {
 			perf: number; //performance
 			stab: number; //stability
 			build: number;
-			res: number; //whether researched (0 - locked, 1 - unlocked, 2 - researched)
+			res: number; //whether researched (0 - needs research, 1 - available)
 			maxClock: number; //kHz
 			maxCore: string; //highest supported core index ("0" - "5")
 			img: string; //image name (eg. PLCC24)
 		}
-		interface Research {
+		interface BaseResearch {
 			name: string;
 			tab: string; //CPU or Tech
 			category: string; //eg. DIP, PLCC, Core
@@ -43,10 +43,12 @@ declare global {
 			resPoints: number;
 			xp: number; //required cpu xp to unlock
 			year: number; //min unlock year
-			res: number; //whether researched (0 - locked, 1 - unlocked, 2 - researched)
 			x: number; //position on R&D screen
-			reqRes: number; //whether required tech is researched(? unused)
 			y: number; //position on R&D screen
+		}
+		interface Research extends BaseResearch {
+			res: number; //whether researched (0 - locked, 1 - unlocked, 2 - researched)
+			reqRes: number; //whether required tech is researched(? unused)
 		}
 	}
 }

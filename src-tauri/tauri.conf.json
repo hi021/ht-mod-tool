@@ -36,7 +36,7 @@
 			"externalBin": [],
 			"icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
 			"identifier": "com.haxor.htmodtool",
-			"longDescription": "",
+			"longDescription": "Handy tool for creating Hardware Tycoon mods",
 			"macOS": {
 				"entitlements": null,
 				"exceptionDomain": "",
@@ -45,7 +45,7 @@
 				"signingIdentity": null
 			},
 			"resources": [],
-			"shortDescription": "Handy tool for creating Hardware Tycoon mods",
+			"shortDescription": "Hardware Tycoon Mod Tool",
 			"targets": "all",
 			"windows": {
 				"certificateThumbprint": null,

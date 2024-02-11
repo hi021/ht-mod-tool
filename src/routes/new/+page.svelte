@@ -1,13 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { LEN_AUTHOR, LEN_NAME, LEN_VERSION } from '$lib/util';
 	import { getVersion } from '@tauri-apps/api/app';
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
 
     const MOD: Writable<App.ModData> = getContext('MOD');
-    const Len_Name = 30;
-    const Len_Author = 24;
-    const Len_Version = 10;
 
     let name = "";
     let author = "";
@@ -15,9 +13,10 @@
     let gameVersion = "0.2.12";
 
     async function createMod() {
-        if(name.length > Len_Name) name.slice(0, Len_Name);
-        if(author.length > Len_Author) author.slice(0, Len_Author);
-        if(version.length > Len_Version) version.slice(0, Len_Version);
+        //TODO VALIDATE AND FORBID [] CHARS
+        name = name.trim().slice(0, LEN_NAME);
+        author = author.trim().slice(0, LEN_AUTHOR);
+        version = version.trim().slice(0, LEN_VERSION);
 
         MOD.set({meta: {name, author, version, gameVersion, toolVersion: await getVersion()}, packages: [], research: []});
 
@@ -27,24 +26,24 @@
 
 <main>
     <h2>Create a New Mod</h2>
-    <form class="form">
-        <label>
+    <form class="form column-center">
+        <label class="label-long">
             Mod name
-            <input type="text" id="name" name="mod name" maxlength="{Len_Name}" bind:value={name}>
-            <small class="text-length">{name.length}/{Len_Name}</small>
+            <input type="text" id="mod_name" name="mod name" maxlength="{LEN_NAME}" spellcheck="false" bind:value={name}>
+            <small class="text-length">{name.length}/{LEN_NAME}</small>
         </label>
-        <label>
+        <label class="label-long">
             Mod authors' names
-            <input type="text" id="author" name="mod author" maxlength="{Len_Author}" bind:value={author}>
-            <small class="text-length">{author.length}/{Len_Author}</small>
+            <input type="text" id="mod_author" name="mod author" maxlength="{LEN_AUTHOR}" spellcheck="false" bind:value={author}>
+            <small class="text-length">{author.length}/{LEN_AUTHOR}</small>
         </label>
         <label>
             Mod version
-            <input type="text" id="version" name="mod version" maxlength="{Len_Version}" bind:value={version}>
+            <input type="text" id="mod_version" name="mod version" autocomplete="new-password" maxlength="{LEN_VERSION}" spellcheck="false" bind:value={version}>
         </label>
         <label>
             Hardware Tycoon version
-            <select id="gameVersion" name="game version" bind:value={gameVersion}>
+            <select id="game_version" name="game version" bind:value={gameVersion}>
                 <option>0.2.12</option>
                 <!-- <option>0.2.11</option>
                 <option>0.2.10</option>
@@ -69,5 +68,4 @@
 </main>
 
 <style>
-
 </style>

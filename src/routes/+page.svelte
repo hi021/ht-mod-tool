@@ -44,6 +44,9 @@
    <h2>for Hardware Tycoon 0.2.12</h2>
    
    <div class="btn-container column flex-fill">
+      {#if $MOD?.meta}
+         <button class="main-menu-btn" on:click={() => goto("/edit")}>Continue Editing {$MOD.meta.name}</button>
+      {/if}
       <button class="main-menu-btn" on:click={() => goto("/new")}>New Modification</button>
       <button class="main-menu-btn" on:click={loadMod}>Load Modification</button>
       {#if error}
@@ -66,7 +69,7 @@
    }
    h2 {
       padding: 0;
-      margin-bottom: 40px;
+      margin-bottom: 70px;
       margin-left: 50%;
       font-weight: 400;
       font-size: 1.75rem;

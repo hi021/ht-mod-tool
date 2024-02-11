@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import PackageEdit from '$lib/PackageEdit.svelte';
-	import { formatNumber } from '$lib/util';
+	import { findResearch, formatNumber } from '$lib/util';
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
     import { save } from '@tauri-apps/api/dialog';
     import { writeTextFile } from '@tauri-apps/api/fs';
 	import MetadataEdit from '$lib/MetadataEdit.svelte';
+	import RdPreview from '$lib/RDPreview.svelte';
 
     let error = ""; //message
     const MOD: Writable<App.ModData> = getContext('MOD');
@@ -29,7 +30,7 @@
 
     function onPackageEditSave() {
         if(editingIndex != null) {
-            const oldRes = findResearch(editingPackage!.name);
+            const oldRes = findResearch($MOD.research, editingPackage!.name);
             if(editingPackage!.res < 2) {
                 //has research
                 if(!$MOD.research) $MOD.research = [];
@@ -55,23 +56,21 @@
         lastScroll = window.scrollY;
         editingIndex = id;
         editingPackage = JSON.parse(JSON.stringify($MOD.packages[id]));
-        if(editingPackage && (editingPackage.res ?? -1) >= 1) editingResearch = JSON.parse(JSON.stringify(findResearch(editingPackage.name)?.res ?? null));
+        if(!editingPackage) return;
+        if(editingPackage.res < 1)
+            editingResearch = JSON.parse(JSON.stringify(findResearch($MOD.research, editingPackage.name)?.res ?? null));
+
         STATE = "editPackage";
     }
 
     function editMeta() {
+        if(STATE == "editMeta") {
+            STATE = null;
+            return;
+        }
+
         editingMeta = JSON.parse(JSON.stringify($MOD.meta));
         STATE = "editMeta";
-    }
-    
-    function findResearch(name: string) {
-        if(!$MOD?.research?.length) return null;
-
-        const id = $MOD.research.findIndex((a) => a.name === name);
-        if(id < 0) return null;
-        const res = $MOD.research[id];
-
-        return {id, res};
     }
     
     function removeResearch(id: number) {
@@ -81,7 +80,7 @@
     function removePackage(id: number) {
         const pckg = $MOD.packages[id];
         if(pckg.res < 2) {
-            const res = findResearch(pckg.name);
+            const res = findResearch($MOD.research, pckg.name);
             if(res?.id != null) removeResearch(res.id);
         }
 
@@ -135,7 +134,7 @@
     }
 </script>
 
-<div class="main-container column scrollbar-dark">
+<div class="main-container column">
 {#if $MOD}
     <h2 class="row-center">
         <span>{$MOD.meta?.name}</span>
@@ -154,7 +153,7 @@
     <aside class="column" class:aside-expand={asideExpanded} on:mouseenter={() => asideExpanded = true} on:mouseleave={() => asideExpanded = false}>
         <ul>
             <li class="row">
-                <button class="btn-none" on:click={() => STATE = "preview"}>
+                <button class="btn-none" on:click={() => STATE = STATE == "preview" ? null : "preview"}>
                     <iconify-icon class="btn-menu" class:aside-active={STATE == "preview"} icon="ic:baseline-preview"/>
                     <span class="btn-menu-text">Preview R&D</span>
                 </button>
@@ -184,7 +183,7 @@
         </aside>
 
         {#if STATE == "preview"}
-            <button on:click={() => STATE = null}>preview</button>
+            <RdPreview></RdPreview>
         {:else if STATE == "editMeta" && editingMeta}
             <MetadataEdit bind:meta={editingMeta} onCancel={exitEdit} onSave={onMetaEditSave}/>
         {:else if STATE != "editPackage"}
@@ -248,7 +247,7 @@
         Looks like the mod was loaded incorrectly.<br>
         Please reload the editor.
     </p>
-    <button class="btn-blue" on:click={() => goto('/')}>Back</button>
+    <button class="btn-blue" style="color: #eee;" on:click={() => goto('/')}>Back</button>
 </div>
 {/if}
 </main>
@@ -340,19 +339,20 @@
         top: 0;
         left: 0;
         align-items: flex-start;
-        padding-top: 20px;
         background-color: rgba(255, 255, 255, 0.5);
         height: 100%;
         user-select: none;
         box-shadow: 3px 0 2px rgba(0,0,0, 0.25);
         transition: background 0.2s ease-out;
+        z-index: 3;
     }
     aside > ul {
         list-style: none;
+        padding: 0;
+        margin: 0;
+        padding-top: 20px;
         position: sticky;
         top: 20px;
-        margin: 0;
-        padding: 0;
     }
     aside li {
         align-items: center;
@@ -383,7 +383,7 @@
     .aside-expand {
         background-color: rgba(255, 255, 255, 0.8);
     }
-    .aside-expand .btn-menu {
+    .aside-expand .btn-menu:not(.aside-active) {
         background-color: rgba(255, 255, 255, 1);
     }
     .aside-expand .btn-menu-text {
