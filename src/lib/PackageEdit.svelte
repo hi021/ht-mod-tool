@@ -200,10 +200,10 @@
 
    <div class="row btn-row">
       <button class="btn-menu btn-menu-cancel" on:click={onCancel}>
-         <iconify-icon icon="ic:baseline-clear"/>
+         <icon style="background-image: url('/icons/clear.svg');"/>
       </button>
       <button class="btn-menu btn-menu-confirm" on:click={onSave}>
-         <iconify-icon icon="ic:baseline-check"/>
+         <icon style="background-image: url('/icons/check.svg');"/>
       </button>
    </div>
 </div>

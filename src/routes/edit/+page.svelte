@@ -154,28 +154,28 @@
         <ul>
             <li class="row">
                 <button class="aside-btn btn-none" on:click={() => STATE = STATE == "preview" ? null : "preview"}>
-                    <iconify-icon class="btn-menu" class:aside-active={STATE == "preview"} icon="ic:baseline-preview"/>
+                    <icon style="background-image: url('/icons/preview.svg');" class="btn-menu" class:aside-active={STATE == "preview"}/>
                     <span class="btn-menu-text">Preview R&D</span>
                 </button>
             </li>
     
             <li class="row">
                 <button class="aside-btn btn-none" on:click={editMeta}>
-                    <iconify-icon class="btn-menu" class:aside-active={STATE == "editMeta"} icon="ic:baseline-toc"/>
+                    <icon style="background-image: url('/icons/toc.svg');" class="btn-menu" class:aside-active={STATE == "editMeta"}/>
                     <span class="btn-menu-text">Mod settings</span>
                 </button>
             </li>
     
             <li class="row">
                 <button class="aside-btn btn-none" on:click={saveMod}>
-                    <iconify-icon class="btn-menu" icon="ic:baseline-save"/>
+                    <icon style="background-image: url('/icons/save.svg');" class="btn-menu"/>
                     <span class="btn-menu-text">Save mod file</span>
                 </button>
             </li>
     
             <li class="row">
                 <button class="aside-btn btn-none" on:click={() => goto("/")}>
-                    <iconify-icon class="btn-menu" icon="ic:baseline-arrow-back"/>
+                    <icon style="background-image: url('/icons/arrow-back.svg');" class="btn-menu"/>
                     <span class="btn-menu-text">Back to menu</span>
                 </button>
             </li>
@@ -218,12 +218,12 @@
                         <td>{formatNumber(pckg.build)}</td>
                         <td>
                             {#if pckg.res < 1}
-                            <iconify-icon icon="ic:baseline-science" title="Has associated research" style="opacity: 0.7;"/>
+                            <icon style="background-image: url('/icons/clear.svg'); opacity: 0.7;" title="Has associated research"/>
                             {/if}
                         </td>
                         <td>
                             <button class="btn-none btn-hover-highlight" on:click|stopPropagation={() => removePackage(id)}>
-                                <iconify-icon icon="ic:baseline-delete"/>
+                                <icon style="background-image: url('/icons/delete.svg');"/>
                             </button>
                         </td>
                     </tr>
@@ -233,7 +233,7 @@
                 <tr>
                     <td class="package-add-item" colspan="11">
                         <button type="button" on:click={addPackage} style="{$MOD.packages.length ? "" : "margin-top: 0;"}">
-                            <iconify-icon icon="ic:baseline-add-circle-outline"/>
+                            <icon style="background-image: url('/icons/add-circle-outline.svg');"/>
                         </button>
                     </td>
                 </tr>

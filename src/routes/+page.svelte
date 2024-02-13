@@ -4,11 +4,13 @@
 	import { getContext, onMount } from "svelte";
    import { open } from '@tauri-apps/api/dialog';
    import { readTextFile } from '@tauri-apps/api/fs';
-	import { parseMod } from "$lib/util";
+	import { HT_VERSION, parseMod } from "$lib/util";
 	import type { Writable } from "svelte/store";
+	import Notification from "$lib/Notification.svelte";
 
    const MOD: Writable<App.ModData> = getContext('MOD');
    let error = "";
+   let notif = "";
    let appVersion: string;
    onMount(async () => {
       appVersion = await getVersion();
@@ -31,6 +33,11 @@
             if(!modParsed) throw new Error("Given mod file is empty or invalid.");
 
             MOD.set(modParsed);
+            if(modParsed.meta.gameVersion != HT_VERSION) {
+               notif = "OTHER_GAMEVER";
+               return;
+            } 
+
             goto('/edit');
          }
       } catch(e) {
@@ -40,8 +47,15 @@
 </script>
 
 <main class="column">
+   {#if notif == "OTHER_GAMEVER"}
+      <Notification onOk={() => {notif = ""; goto('/edit');}}>
+         This mod was created for a version of Hardware Tycoon other than <strong>{HT_VERSION}</strong>.<br>
+         This version of the tool only supports {HT_VERSION}, meaning there may be inconsistencies between what you see here and in the game.<br>
+         You can change the mod's supported game version in the settings after making sure it works
+      </Notification>
+   {/if}
    <h1>Hardware Tycoon Mod Tool</h1>
-   <h2>for Hardware Tycoon 0.2.12</h2>
+   <h2>for Hardware Tycoon {HT_VERSION}</h2>
    
    <div class="btn-container column flex-fill">
       {#if $MOD?.meta}
@@ -107,8 +121,8 @@
    footer {
       padding: 6px 12px;
       justify-content: space-between;
-      background-color: rgba(0, 0, 0, 0.2);
-      border-top-left-radius: 3px;
-      border-top-right-radius: 3px;
+      background-color: var(--color-ht-primary);
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
    }
 </style>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { LEN_AUTHOR, LEN_NAME, LEN_VERSION } from "./util";
+	import { HT_VERSION, LEN_AUTHOR, LEN_NAME, LEN_VERSION } from "./util";
 
    export let meta: App.ModMetadata;
    export let onSave: () => void;
@@ -24,17 +24,23 @@
       <input type="text" maxlength="{LEN_VERSION}" bind:value={meta.version}>
    </label>
 
-   <p style="text-align: center;">
+   <p style="text-align: center; margin: 0; margin-bottom: 6px;">
       Supported game version<br>
       {meta.gameVersion}
    </p>
+   {#if meta.gameVersion != HT_VERSION}
+      <button class="btn-menu" style="border-radius: 6px; font-size: 1rem;" on:click={() => meta.gameVersion = HT_VERSION}>
+         <icon style="background-image: url('/icons/arrow-circle-up.svg'); margin-right: 3px;"/>
+         Set to {HT_VERSION}
+      </button>
+   {/if}
 
    <div class="row btn-row">
       <button class="btn-none btn-menu btn-menu-cancel" on:click={onCancel}>
-         <iconify-icon icon="ic:baseline-clear"/>
+         <icon style="background-image: url('/icons/clear.svg');"/>
       </button>
       <button class="btn-none btn-menu btn-menu-confirm" on:click={onSave}>
-         <iconify-icon icon="ic:baseline-check"/>
+         <icon style="background-image: url('/icons/check.svg');"/>
       </button>
    </div>
 </div>

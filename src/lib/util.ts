@@ -1,6 +1,7 @@
 export const LEN_NAME = 30; //max lengths
 export const LEN_AUTHOR = 24;
 export const LEN_VERSION = 10;
+export const HT_VERSION = "0.2.12";
 
 export function formatNumber(num: number | string, token = " "): string {
 	return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, token);
