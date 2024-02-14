@@ -29,7 +29,7 @@
       {meta.gameVersion}
    </p>
    {#if meta.gameVersion != HT_VERSION}
-      <button class="btn-menu" style="border-radius: 6px; font-size: 1rem;" on:click={() => meta.gameVersion = HT_VERSION}>
+      <button class="btn-menu-rect" on:click={() => meta.gameVersion = HT_VERSION}>
          <icon style="background-image: url('/icons/arrow-circle-up.svg'); margin-right: 3px;"/>
          Set to {HT_VERSION}
       </button>

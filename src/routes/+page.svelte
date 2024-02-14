@@ -50,8 +50,8 @@
    {#if notif == "OTHER_GAMEVER"}
       <Notification onOk={() => {notif = ""; goto('/edit');}}>
          This mod was created for a version of Hardware Tycoon other than <strong>{HT_VERSION}</strong>.<br>
-         This version of the tool only supports {HT_VERSION}, meaning there may be inconsistencies between what you see here and in the game.<br>
-         You can change the mod's supported game version in the settings after making sure it works
+         This version of the tool only supports {HT_VERSION}, meaning there may be inconsistencies between what you see here and in the game.<br><br>
+         You can change the mod's supported game version in the settings after making sure it works to get rid of this warning.
       </Notification>
    {/if}
    <h1>Hardware Tycoon Mod Tool</h1>

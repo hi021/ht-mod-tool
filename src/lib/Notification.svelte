@@ -2,7 +2,7 @@
    export let onOk: (() => void) | undefined = undefined;
 </script>
 
-<div class="overlay">
+<div class="overlay column-center">
    <div class="form">
       <p>
          <slot/>
@@ -24,12 +24,10 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.3);
+      background-color: rgba(0, 0, 0, 0.125);
    }
    .form {
-      background-color: rgb(255, 255, 255);
-      border-radius: 6px;
-      margin: auto;
+      background-color: #eee;
       font-size: 1.5rem;
    }
 </style>

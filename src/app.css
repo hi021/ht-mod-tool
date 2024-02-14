@@ -265,6 +265,8 @@ icon {
 	height: 1em;
 	vertical-align: 0;
 	background-size: cover;
+	background-repeat: no-repeat;
+	background-origin: content-box;
 }
 
 /* FLEX */
@@ -298,6 +300,7 @@ icon {
 	padding: 16px;
 	border-radius: 6px;
 	background-color: rgba(255, 255, 255, 0.3);
+	box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.275);
 }
 .form label {
 	display: flex;
@@ -318,14 +321,21 @@ icon {
 	background-color: rgba(255, 20, 60, 0.6);
 }
 
-.btn-menu {
-	border-radius: 50%;
-	font-size: 1.5rem;
+.btn-menu,
+.btn-menu-rect {
 	padding: 8px;
+	font-size: 1em;
 	background-color: rgba(255, 255, 255, 0.5);
 	border: none;
 }
-.btn-menu:hover {
+.btn-menu-rect {
+	border-radius: 6px;
+}
+.btn-menu {
+	border-radius: 50%;
+	font-size: 1.5rem;
+}
+:is(.btn-menu, .btn-menu-rect):hover {
 	background-color: rgba(255, 255, 255, 0.75);
 }
 .btn-menu-cancel:hover,

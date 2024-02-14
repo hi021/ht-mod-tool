@@ -15,10 +15,12 @@
     
     let lastScroll = 0; //used to set scroll back to last position after editing
     let editingIndex: number | null = null;
-    let editingPackage: App.Package | null = null; //copy to allow cancelling
+    let editingPackage: App.Package | null = null; //deep copies so you can cancel editing
     let editingResearch: App.Research | null = null;
     let editingMeta: App.ModMetadata | null = null;
     let STATE: "editPackage" | "editMeta" | "preview" | null = null;
+    let lastDeleted: {pckg: App.Package, id: number} | null = null; //last deleted package so you can undo
+    let lastDeletedTimeout: ReturnType<typeof setTimeout> | null = null;
 
     let asideExpanded = false; //is mouse in aside bar
 
@@ -84,9 +86,19 @@
             if(res?.id != null) removeResearch(res.id);
         }
 
-        $MOD.packages.splice(id, 1);
+        lastDeleted = {pckg: $MOD.packages.splice(id, 1)[0], id};
+        lastDeletedTimeout = setTimeout(() => lastDeleted = null, 10000);
         $MOD = $MOD;
         console.log($MOD);
+    }
+
+    function undoRemovePackage() {
+        if(!lastDeleted) return;
+
+        $MOD.packages.splice(lastDeleted.id, 0, lastDeleted.pckg);
+        $MOD = $MOD;
+        lastDeleted = null;
+        if(lastDeletedTimeout) clearTimeout(lastDeletedTimeout);
     }
 
     function addPackage() {
@@ -149,6 +161,14 @@
 {#if STATE == "editPackage" && editingPackage}
     <PackageEdit bind:editing={editingPackage} bind:research={editingResearch} onCancel={exitEdit} onSave={onPackageEditSave}/>
 {:else if $MOD}
+    {#if lastDeleted}
+        <footer class="bottom-notif row-center unselectable">
+            <p>
+                Removed <strong style="font-weight: 500;">{lastDeleted.pckg.name}</strong>
+                <button class="btn-menu-rect" on:click={undoRemovePackage}>Undo</button>
+            </p>
+        </footer>
+    {/if}
     <div class="table-wrapper flex-fill">
     <aside class="column" class:aside-expand={asideExpanded} on:mouseenter={() => asideExpanded = true} on:mouseleave={() => asideExpanded = false}>
         <ul>
@@ -218,7 +238,7 @@
                         <td>{formatNumber(pckg.build)}</td>
                         <td>
                             {#if pckg.res < 1}
-                            <icon style="background-image: url('/icons/clear.svg'); opacity: 0.7;" title="Has associated research"/>
+                            <icon style="background-image: url('/icons/science.svg'); opacity: 0.5;" title="Has associated research"/>
                             {/if}
                         </td>
                         <td>
@@ -386,6 +406,22 @@
     }
     .aside-expand .btn-menu-text {
         max-width: 16ch;
+    }
+
+    .bottom-notif {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        z-index: 2;
+    }
+    .bottom-notif > p {
+        margin: 0 auto;
+        padding: 7px 20px;
+        background-color: rgba(255, 255, 255, 0.7);
+    }
+    .bottom-notif .btn-menu-rect {
+        margin-left: 8px;
     }
 
     .error-p {

@@ -38,6 +38,9 @@
          case "Core": {
             y = 4; break;
          }
+         default: {
+            y = 4; break;
+         }
       }
    }
    --y; //decrease x and y for in-game positioning
