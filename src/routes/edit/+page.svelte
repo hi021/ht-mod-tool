@@ -8,10 +8,37 @@
     import { writeTextFile } from '@tauri-apps/api/fs';
 	import MetadataEdit from '$lib/MetadataEdit.svelte';
 	import RdPreview from '$lib/RDPreview.svelte';
+	import { slide } from 'svelte/transition';
 
     let error = ""; //message
     const MOD: Writable<App.ModData> = getContext('MOD');
     console.log($MOD);
+    let packagesSorted: App.Package[] = JSON.parse(JSON.stringify($MOD?.packages ?? []));
+    let sortedBy = "default"; //column name or no. as default
+    let sortedAsc = false;
+
+    function sortPackages() {
+        if(!packagesSorted?.length) return;
+        
+        if(sortedBy == "default") {
+            packagesSorted = JSON.parse(JSON.stringify($MOD.packages));
+            if(sortedAsc) packagesSorted = packagesSorted.reverse();
+            return;
+        }
+        packagesSorted = packagesSorted.sort((a: Record<string, any>, b: Record<string, any>) =>
+                            a[sortedBy] < b[sortedBy] ? sortedAsc ? 1 : -1 : sortedAsc ? -1 : 1);
+    }
+
+    $: sortedBy, sortedAsc, sortPackages();
+
+    function setSortedBy(field: string) {
+        if(sortedBy == field) {
+            sortedAsc = !sortedAsc;
+            return;
+        }
+        sortedAsc = false;
+        sortedBy = field;
+    }
     
     let lastScroll = 0; //used to set scroll back to last position after editing
     let editingIndex: number | null = null;
@@ -19,7 +46,7 @@
     let editingResearch: App.Research | null = null;
     let editingMeta: App.ModMetadata | null = null;
     let STATE: "editPackage" | "editMeta" | "preview" | null = null;
-    let lastDeleted: {pckg: App.Package, id: number} | null = null; //last deleted package so you can undo
+    let lastDeleted: {pckg: App.Package, id: number, res?: App.Research} | null = null; //last deleted package so you can undo
     let lastDeletedTimeout: ReturnType<typeof setTimeout> | null = null;
 
     let asideExpanded = false; //is mouse in aside bar
@@ -32,19 +59,24 @@
 
     function onPackageEditSave() {
         if(editingIndex != null) {
-            const oldRes = findResearch($MOD.research, editingPackage!.name);
+            const oldPckg = $MOD.packages[editingIndex];
+            const oldRes = findResearch($MOD.research, oldPckg.name);
+            
             if(editingPackage!.res < 2) {
                 //has research
+                editingResearch!.name = editingPackage!.name; //edit research name in case it was changed
                 if(!$MOD.research) $MOD.research = [];
                 if(!oldRes) $MOD.research.push(editingResearch as App.Research); //add new research
                 else $MOD.research[oldRes.id] = editingResearch as App.Research; //edit existing research
             } else {
-                //doesn't have research
+                //doesn't have research anymore
                 if(oldRes && $MOD.research?.length)
                     $MOD.research = $MOD.research.filter((r, i) => i != oldRes.id) //remove research
             }
 
             $MOD.packages[editingIndex] = editingPackage as App.Package;
+            packagesSorted = JSON.parse(JSON.stringify($MOD.packages));
+            sortPackages();
         }
         exitEdit();
     }
@@ -56,9 +88,11 @@
 
     function edit(id: number) {
         lastScroll = window.scrollY;
-        editingIndex = id;
-        editingPackage = JSON.parse(JSON.stringify($MOD.packages[id]));
+        const originalId = $MOD.packages.findIndex((p) => p.name == packagesSorted[id].name);
+        editingPackage = JSON.parse(JSON.stringify($MOD.packages[originalId]));
         if(!editingPackage) return;
+        editingIndex = originalId;
+        
         if(editingPackage.res < 1)
             editingResearch = JSON.parse(JSON.stringify(findResearch($MOD.research, editingPackage.name)?.res ?? null));
 
@@ -80,23 +114,35 @@
     }
 
     function removePackage(id: number) {
-        const pckg = $MOD.packages[id];
+        let deletedResearch;
+
+        const pckg = packagesSorted[id];
         if(pckg.res < 2) {
             const res = findResearch($MOD.research, pckg.name);
-            if(res?.id != null) removeResearch(res.id);
+            if(res?.id != null) {
+                deletedResearch = JSON.parse(JSON.stringify(res.res));
+                removeResearch(res.id);
+            }
         }
 
-        lastDeleted = {pckg: $MOD.packages.splice(id, 1)[0], id};
+        const originalId = $MOD.packages.findIndex((p) => p.name == pckg.name);
+        packagesSorted.splice(id, 1);
+        lastDeleted = {pckg: $MOD.packages.splice(originalId, 1)[0], id, res: deletedResearch};
         lastDeletedTimeout = setTimeout(() => lastDeleted = null, 10000);
+
         $MOD = $MOD;
-        console.log($MOD);
+        packagesSorted = packagesSorted;
     }
 
     function undoRemovePackage() {
         if(!lastDeleted) return;
 
         $MOD.packages.splice(lastDeleted.id, 0, lastDeleted.pckg);
+        if(lastDeleted.res) $MOD.research?.push(lastDeleted.res);
+
         $MOD = $MOD;
+        packagesSorted = JSON.parse(JSON.stringify($MOD.packages));
+        sortPackages();
         lastDeleted = null;
         if(lastDeletedTimeout) clearTimeout(lastDeletedTimeout);
     }
@@ -162,7 +208,7 @@
     <PackageEdit bind:editing={editingPackage} bind:research={editingResearch} onCancel={exitEdit} onSave={onPackageEditSave}/>
 {:else if $MOD}
     {#if lastDeleted}
-        <footer class="bottom-notif row-center unselectable">
+        <footer class="bottom-notif row-center unselectable" transition:slide={{duration: 200, axis: "y"}}>
             <p>
                 Removed <strong style="font-weight: 500;">{lastDeleted.pckg.name}</strong>
                 <button class="btn-menu-rect" on:click={undoRemovePackage}>Undo</button>
@@ -203,29 +249,29 @@
         </aside>
 
         {#if STATE == "preview"}
-            <RdPreview></RdPreview>
+            <RdPreview onExit={() => STATE = null}/>
         {:else if STATE == "editMeta" && editingMeta}
             <MetadataEdit bind:meta={editingMeta} onCancel={exitEdit} onSave={onMetaEditSave}/>
         {:else if STATE != "editPackage"}
-            <table class="package-table" style="{$MOD.packages.length ? "" : "width: 55%; --radius: 0;"}">
-                {#if $MOD.packages?.length}
+            <table class="package-table" style="{packagesSorted.length ? "" : "width: 55%; --radius: 0;"}">
+                {#if packagesSorted.length}
                 <thead>
                     <tr>
                         <th></th>
                         <th></th>
-                        <th>Package</th>
-                        <th>Cost</th>
-                        <th>Time</th>
-                        <th>Unit</th>
-                        <th>Perf.</th>
-                        <th>Stability</th>
-                        <th>Build</th>
+                        <th class="sortable" class:sorted={sortedBy == "name"} class:sortedAsc={sortedAsc} on:click={() => setSortedBy("name")}>Package</th>
+                        <th class="sortable" class:sorted={sortedBy == "cost"} class:sortedAsc={sortedAsc} on:click={() => setSortedBy("cost")}>Cost</th>
+                        <th class="sortable" class:sorted={sortedBy == "time"} class:sortedAsc={sortedAsc} on:click={() => setSortedBy("time")}>Time</th>
+                        <th class="sortable" class:sorted={sortedBy == "unit"} class:sortedAsc={sortedAsc} on:click={() => setSortedBy("unit")}>Unit</th>
+                        <th class="sortable" class:sorted={sortedBy == "perf"} class:sortedAsc={sortedAsc} on:click={() => setSortedBy("perf")}>Perf.</th>
+                        <th class="sortable" class:sorted={sortedBy == "stab"} class:sortedAsc={sortedAsc} on:click={() => setSortedBy("stab")}>Stability</th>
+                        <th class="sortable" class:sorted={sortedBy == "build"} class:sortedAsc={sortedAsc} on:click={() => setSortedBy("build")}>Build</th>
                         <th></th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {#each $MOD.packages as pckg, id}
+                    {#each packagesSorted as pckg, id}
                     <tr class="package-item" on:click={() => edit(id)}>
                         <td style="font-size: 67.5%;">#{id + 1}</td>
                         <td class="row"><img class="package-img" src="/package/{pckg.img}.png" alt=""></td>
@@ -312,8 +358,8 @@
         padding-right: 8px;
     }
     .package-table th {
-        cursor: default;
         padding: 8px 10px;
+        user-select: none;
         background-color: var(--color-ht-primary);
     }
     .package-table th:first-child {
@@ -321,6 +367,30 @@
     }
     .package-table th:last-child {
         border-top-right-radius: var(--radius);
+    }
+    .sortable:hover,
+    .sortable:focus {
+        cursor: pointer;
+        background-color: var(--color-highlight-blue);
+    }
+    .sorted {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .sorted::after {
+        content: "";
+        display: inline-block;
+        height: 1.125em;
+        width: 1.125em;
+        margin-left: 2px;
+        background-image: url('/icons/arrow-drop-up.svg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-origin: content-box;
+    }
+    .sortedAsc.sorted::after {
+        transform: rotate(180deg);
     }
 
     .package-item {
@@ -413,15 +483,20 @@
         bottom: 0;
         right: 0;
         width: 100%;
+        font-size: 1.125rem;
         z-index: 2;
     }
     .bottom-notif > p {
         margin: 0 auto;
         padding: 7px 20px;
-        background-color: rgba(255, 255, 255, 0.7);
+        background-color: rgba(255, 255, 255, 0.8);
     }
     .bottom-notif .btn-menu-rect {
         margin-left: 8px;
+        background-color: var(--color-ht-secondary);
+    }
+    .bottom-notif .btn-menu-rect:hover {
+        background-color: var(--color-highlight-blue);
     }
 
     .error-p {
