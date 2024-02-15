@@ -71,7 +71,7 @@
    }
    .btn-circle:hover,
    .btn-circle:focus {
-      background-color: rgba(0,0,0, 0.34);
+      background-color: rgba(0,0,0, 0.25);
       box-shadow: none;
    }
 </style>

@@ -284,7 +284,7 @@
                         <td>{formatNumber(pckg.build)}</td>
                         <td>
                             {#if pckg.res < 1}
-                            <icon style="background-image: url('/icons/science.svg'); opacity: 0.5;" title="Has associated research"/>
+                            <icon class="tooltip" data-tooltip="Has associated research" style="background-image: url('/icons/science.svg');"/>
                             {/if}
                         </td>
                         <td>

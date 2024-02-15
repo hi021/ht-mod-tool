@@ -61,7 +61,7 @@
          </label>
       </div>
 
-      <div class="row">
+      <div class="row-center">
          <label>
             Image
             <select bind:value={editing.img}>
@@ -88,37 +88,7 @@
       </div>
    </div>
 
-   <fieldset class="row">
-   <legend>Limitations</legend>
-      <label>
-         Max clock
-         <input type="number" min="200" max="1000000000000" step="1" placeholder="in kHz" bind:value={editing.maxClock}>
-         <small>
-            {#if editing.maxClock >= 1000000000000}
-               TOO MUCH
-            {:else if editing.maxClock > 100000}
-               {Math.floor(editing.maxClock/10000)/100} GHz
-            {/if}
-
-            {#if editing.maxClock < 100000000}
-               {Math.floor(editing.maxClock/10)/100} MHz
-            {/if}
-         </small>
-      </label>
-      <label>
-         Supported core
-         <select bind:value={editing.maxCore}>
-            <option value="0">Single-core</option>
-            <option value="1">Experimental dual-core</option>
-            <option value="2">Basic dual-core</option>
-            <option value="3">Dual-core</option>
-            <option value="4">Triple-core</option>
-            <option value="5">Quad-core</option>
-         </select>
-      </label>
-   </fieldset>
-
-   <div class="row">
+   <div class="row main-columns">
       <fieldset class="column">
       <legend>Stats</legend>
          <label>
@@ -155,13 +125,10 @@
          <span><strong>{Math.round((editing.perf + editing.stab + editing.build) / editing.unit*100)/100}</strong> score/cost</span>
       </fieldset>
 
-      <div class="column">
-         <label class="row-center" style="margin-left: 10ch;">
-            Researched
-            <input type="checkbox" checked={editing.res >= 1} on:change={onResearchedChange}>
-         </label>
+      
+      <div class="column" style="width: {editing.res < 1 ? "auto" : "290.08px"};">
          {#if research && editing.res < 1}
-            <fieldset class="column">
+            <fieldset class="column research-fieldset">
             <legend>Research</legend>
                <div class="row">
                   <label title="Fixed one-time cost at the beginning of the research">
@@ -195,8 +162,43 @@
                </div>
             </fieldset>
          {/if}
+
+         <label class="row-center" style="height: fit-content; margin-top: auto;">
+            Researched
+            <input type="checkbox" style="margin-left: 5px;" checked={editing.res >= 1} on:change={onResearchedChange}>
+         </label>
       </div>
    </div>
+
+   <fieldset class="row" style="margin-top: 4px;">
+      <legend>Limitations</legend>
+         <label>
+            Max clock
+            <input type="number" min="200" max="1000000000000" step="1" placeholder="in kHz" bind:value={editing.maxClock}>
+            <small>
+               {#if editing.maxClock >= 1000000000000}
+                  TOO MUCH
+               {:else if editing.maxClock > 100000}
+                  {Math.floor(editing.maxClock/10000)/100} GHz
+               {/if}
+   
+               {#if editing.maxClock < 100000000}
+                  {Math.floor(editing.maxClock/10)/100} MHz
+               {/if}
+            </small>
+         </label>
+         <label>
+            Supported core
+            <select bind:value={editing.maxCore}>
+               <option value="0">Single-core</option>
+               <option value="1">Experimental dual-core</option>
+               <option value="2">Basic dual-core</option>
+               <option value="3">Dual-core</option>
+               <option value="4">Triple-core</option>
+               <option value="5">Quad-core</option>
+            </select>
+         </label>
+   </fieldset>
 
    <div class="row btn-row">
       <button class="btn-menu btn-menu-cancel" on:click={onCancel}>
@@ -218,20 +220,23 @@
       text-align: center;
       font-size: 2rem;
       margin-top: 0;
+      margin-bottom: 6px;
    }
 
-   label {
-      margin: 4px;
+   .main-columns > fieldset {
+      margin-right: 10px;
    }
-   label:not(.row, .row-center) {
-      display: flex;
-      flex-direction: column;
+
+   .research-fieldset label {
+      margin-bottom: 5px;
    }
 
    img {
-      padding: 3px;
-      margin: 3px;
+      width: 108px;
+      height: 108px;
+      padding: 0 3px;
+      margin: 5px;
       background-color: rgba(255,255,255, 0.2);
-      border-radius: 2px;
+      border-radius: 4px;
    }
 </style>

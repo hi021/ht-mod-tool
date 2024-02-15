@@ -7,6 +7,7 @@
 </script>
 
 <div class="form column-center">
+   <!-- TODO VALIDATE -->
    <label class="label-long">
       Mod name
       <input type="text" maxlength="{LEN_NAME}" bind:value={meta.name}>

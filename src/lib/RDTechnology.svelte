@@ -83,12 +83,14 @@
    }
 </script>
 
-<div class="box column-center" style="top: {pad + fullSize*y}px; left: {pad + fullSize*x}px; min-width: {size}px; min-height: {size}px;"
-title="{res.name}
+<div class="box column-center tooltip tooltip-abs" class:tooltip-bottom={y == 0}
+     style="top: {pad + fullSize*y}px; left: {pad + fullSize*x}px; min-width: {size}px; min-height: {size}px;"
+data-tooltip="{res.name}
 Cost: ${res.cost}
 Research needed: {res.resPoints}
 X {res.x}, Y {res.y}
 Min. {res.xp} xp, Y{res.year}">
+
    {#if img}
       <img class="image unselectable" src={img} alt="">
       <small class="res-name" class:res-name-long={displayName.length >= 8} class:res-name-longer={displayName.length >= 12}>
@@ -108,17 +110,17 @@ Min. {res.xp} xp, Y{res.year}">
       position: absolute;
       background-color: #fff;
       border: 2px solid #bbb;
-      overflow: hidden;
    }
    .image {
       width: 46px;
       height: 46px;
    }
-
+   
    .res-name {
       position: absolute;
       bottom: 1px;
       right: 2px;
+      width: 100%;
       color: #777;
       font-weight: 500;
       font-size: 16px;
@@ -126,6 +128,7 @@ Min. {res.xp} xp, Y{res.year}">
       margin: 0;
       padding: 0;
       cursor: default;
+      overflow: hidden;
    }
    .res-name-long {
       font-size: 14px;
