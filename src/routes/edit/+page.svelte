@@ -63,8 +63,12 @@
             const oldPckg = $MOD.packages[editingIndex];
             const oldRes = findResearch($MOD.research, oldPckg.name);
 
-            if(!parsePackageName(editingPackage!.name)) {
-                //can't contain | or ;
+            //check for invalid name
+            if(!editingPackage!.name.length || !parsePackageName(editingPackage!.name) || editingPackage!.name.includes("|") || editingPackage!.name.includes(";")) {
+                return;
+            }
+            //check for duplicates
+            if($MOD.packages.findIndex((p) => p.name == editingPackage!.name) != editingIndex) {
                 return;
             }
             
@@ -95,7 +99,8 @@
 
             const toolVersion = await getVersion();
             if(toolVersion) editingMeta.toolVersion = toolVersion.replaceAll("[", "").replaceAll("]", "");
-            $MOD.meta = editingMeta;
+
+            if(editingMeta.name.length && editingMeta.author.length && editingMeta.version.length) $MOD.meta = editingMeta;
         }
         exitEdit();
     }

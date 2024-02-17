@@ -11,6 +11,7 @@
    const MOD: Writable<App.ModData> = getContext('MOD');
    let error = "";
    let notif = "";
+   let pageChange = false;
    let appVersion: string;
    onMount(async () => {
       appVersion = await getVersion();
@@ -38,6 +39,7 @@
                return;
             } 
 
+            pageChange = true;
             goto('/edit');
          }
       } catch(e) {
@@ -48,7 +50,7 @@
 
 <main class="column">
    {#if notif == "OTHER_GAMEVER"}
-      <Notification onOk={() => {notif = ""; goto('/edit');}}>
+      <Notification onOk={() => {notif = ""; pageChange = true; goto('/edit');}}>
          This mod was created for a version of Hardware Tycoon other than <strong>{HT_VERSION}</strong>.<br>
          This version of the tool only supports {HT_VERSION}, meaning there may be inconsistencies between what you see here and in the game.<br><br>
          You can change the mod's supported game version in the settings after making sure it works to get rid of this warning.
@@ -58,11 +60,11 @@
    <h2>for Hardware Tycoon {HT_VERSION}</h2>
    
    <div class="btn-container column flex-fill">
-      {#if $MOD?.meta}
-         <button class="main-menu-btn" on:click={() => goto("/edit")}>Continue Editing {$MOD.meta.name}</button>
+      {#if $MOD?.meta && !pageChange}
+         <button class="main-menu-btn" on:click={() => {pageChange = true; goto("/edit")}}>Continue Editing {$MOD.meta.name}</button>
       {/if}
-      <button class="main-menu-btn" on:click={() => goto("/new")}>New Modification</button>
-      <button class="main-menu-btn" on:click={loadMod}>Load Modification</button>
+      <button class="main-menu-btn" disabled={pageChange} on:click={() => {pageChange = true; goto("/new");}}>New Modification</button>
+      <button class="main-menu-btn" disabled={pageChange} on:click={loadMod}>Load Modification</button>
       {#if error}
          <p class="error-p">{error}</p>
       {/if}

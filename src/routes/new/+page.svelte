@@ -11,20 +11,46 @@
     let author = "";
     let version = "";
     let gameVersion = HT_VERSION;
-    const errors: string[] = [];
+    let errors = {name: false, author: false, version: false, gameVersion: false};
+    let errorMsg = "";
 
     async function createMod() {
-        errors.length = 0;
+        errors = {name: false, author: false, version: false, gameVersion: false};
 
         name = name.trim().slice(0, LEN_NAME);
         author = author.trim().slice(0, LEN_AUTHOR);
         version = version.trim().slice(0, LEN_VERSION);
 
-        if(name.includes('[') || name.includes(']')) errors.push('name');
-        if(author.includes('[') || author.includes(']')) errors.push('author');
-        if(version.includes('[') || version.includes(']')) errors.push('version');
-        if(gameVersion != HT_VERSION) errors.push('gameVersion'); //only allow 0.2.12
-        if(errors.length) return;
+        if(!name.length) {
+            errors.name = true;
+            errorMsg = "All fields must be filled in!"
+        }
+        if(!author.length) {
+            errors.author = true;
+            errorMsg = "All fields must be filled in!"
+        }
+        if(!version.length) {
+            errors.version = true;
+            errorMsg = "All fields must be filled in!"
+        }
+
+        if(name.includes('[') || name.includes(']')) {
+            errors.name = true;
+            errorMsg = "Names must not contain square brackets []!"
+        }
+        if(author.includes('[') || author.includes(']')) {
+            errors.author = true;
+            errorMsg = "Names must not contain square brackets []!"
+        }
+        if(version.includes('[') || version.includes(']')) {
+            errors.version = true;
+            errorMsg = "Names must not contain square brackets []!"
+        }
+        if(gameVersion != HT_VERSION) {
+            errors.gameVersion = true;
+            errorMsg = "Invalid Hardware Tycoon version!"
+        }
+        if(errorMsg) return;
 
         MOD.set({meta: {name, author, version, gameVersion, toolVersion: await getVersion()}, packages: [], research: []});
 
@@ -37,32 +63,34 @@
     <form class="form column-center">
         <label class="label-long">
             Mod name
-            <input type="text" class:error={errors.includes('name')} id="mod_name" name="mod name" maxlength="{LEN_NAME}" spellcheck="false" bind:value={name}>
+            <input type="text" class:error={errors.name} id="mod_name" name="mod name" on:change={() => errors.name = false}
+                    maxlength="{LEN_NAME}" spellcheck="false" bind:value={name}>
             <div class="bar-length" style="width: {name.length/LEN_NAME * 100}%;"></div>
             <small class="text-length">{name.length}/{LEN_NAME}</small>
         </label>
         <label class="label-long">
             Mod authors' names
-            <input type="text" class:error={errors.includes('author')} id="mod_author" name="mod author" maxlength="{LEN_AUTHOR}" spellcheck="false" bind:value={author}>
+            <input type="text" class:error={errors.author} id="mod_author" name="mod author" on:change={() => errors.author = false}
+                    maxlength="{LEN_AUTHOR}" spellcheck="false" bind:value={author}>
             <div class="bar-length" style="width: {author.length/LEN_AUTHOR * 100}%;"></div>
             <small class="text-length">{author.length}/{LEN_AUTHOR}</small>
         </label>
         <label>
             Mod version
-            <input type="text" class:error={errors.includes('version')} id="mod_version" name="mod version" autocomplete="new-password" maxlength="{LEN_VERSION}" spellcheck="false" bind:value={version}>
+            <input type="text" class:error={errors.version} id="mod_version" name="mod version" on:change={() => errors.version = false}
+                    autocomplete="new-password" maxlength="{LEN_VERSION}" spellcheck="false" bind:value={version}>
             <small class="text-length">{version.length}/{LEN_VERSION}</small>
         </label>
         <label>
             Hardware Tycoon version
-            <select id="game_version" name="game version" bind:value={gameVersion}>
+            <select id="game_version" class:error={errors.gameVersion} name="game version" on:change={() => errors.gameVersion = false}
+                    bind:value={gameVersion}>
                 <option>{HT_VERSION}</option>
             </select>
         </label>
 
-        {#if errors.length}
-            <p class="error-p">
-                Names must not contain square brackets []!
-            </p>
+        {#if errorMsg}
+            <p class="error-p">{errorMsg}</p>
         {/if}
 
         <div class="row btn-row">
