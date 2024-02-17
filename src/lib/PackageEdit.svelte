@@ -6,7 +6,7 @@
    export let onSave: () => void;
    export let onCancel: () => void;
 
-   const Len_PackageName = 10;
+   const Len_PackageName = 10; //package type max length
 
    let packageType: "DIP" | "PLCC" | "PGA" | "Custom";
    let packageName: "DIP" | "PLCC" | "PGA" | string; //may only contain letters

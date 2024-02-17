@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import PackageEdit from '$lib/PackageEdit.svelte';
-	import { findResearch, formatNumber } from '$lib/util';
+	import { LEN_AUTHOR, LEN_NAME, LEN_VERSION, findResearch, formatNumber, parsePackageName } from '$lib/util';
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
     import { save } from '@tauri-apps/api/dialog';
@@ -9,6 +9,7 @@
 	import MetadataEdit from '$lib/MetadataEdit.svelte';
 	import RdPreview from '$lib/RDPreview.svelte';
 	import { slide } from 'svelte/transition';
+	import { getVersion } from '@tauri-apps/api/app';
 
     let error = ""; //message
     const MOD: Writable<App.ModData> = getContext('MOD');
@@ -61,6 +62,11 @@
         if(editingIndex != null) {
             const oldPckg = $MOD.packages[editingIndex];
             const oldRes = findResearch($MOD.research, oldPckg.name);
+
+            if(!parsePackageName(editingPackage!.name)) {
+                //can't contain | or ;
+                return;
+            }
             
             if(editingPackage!.res < 2) {
                 //has research
@@ -81,8 +87,16 @@
         exitEdit();
     }
 
-    function onMetaEditSave() {
-        if(editingMeta) $MOD.meta = editingMeta;
+    async function onMetaEditSave() {
+        if(editingMeta) {
+            editingMeta.name = editingMeta.name.trim().replaceAll("[", "").replaceAll("]", "").slice(0, LEN_NAME);
+            editingMeta.author = editingMeta.author.trim().replaceAll("[", "").replaceAll("]", "").slice(0, LEN_AUTHOR);
+            editingMeta.version = editingMeta.version.trim().replaceAll("[", "").replaceAll("]", "").slice(0, LEN_VERSION);
+
+            const toolVersion = await getVersion();
+            if(toolVersion) editingMeta.toolVersion = toolVersion.replaceAll("[", "").replaceAll("]", "");
+            $MOD.meta = editingMeta;
+        }
         exitEdit();
     }
 

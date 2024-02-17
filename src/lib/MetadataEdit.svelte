@@ -7,7 +7,6 @@
 </script>
 
 <div class="form column-center">
-   <!-- TODO VALIDATE -->
    <label class="label-long">
       Mod name
       <input type="text" maxlength="{LEN_NAME}" bind:value={meta.name}>
@@ -23,6 +22,7 @@
    <label>
       Mod version
       <input type="text" maxlength="{LEN_VERSION}" bind:value={meta.version}>
+      <small class="text-length">{meta.version.length}/{LEN_VERSION}</small>
    </label>
 
    <p style="text-align: center; margin: 0; margin-bottom: 6px;">
@@ -45,6 +45,3 @@
       </button>
    </div>
 </div>
-
-<style>
-</style>
