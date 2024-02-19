@@ -9,16 +9,17 @@
 	import Notification from "$lib/Notification.svelte";
 
    const MOD: Writable<App.ModData> = getContext('MOD');
-   let error = "";
-   let notif = "";
+   let errorText = "";
+   let notifType: "" | "OTHER_GAMEVER" = "";
    let pageChange = false;
    let appVersion: string;
+
    onMount(async () => {
       appVersion = await getVersion();
    })
 
    async function loadMod() {
-      error = "";
+      errorText = "";
 
       try {
          //selected file path
@@ -35,7 +36,7 @@
 
             MOD.set(modParsed);
             if(modParsed.meta.gameVersion != HT_VERSION) {
-               notif = "OTHER_GAMEVER";
+               notifType = "OTHER_GAMEVER";
                return;
             } 
 
@@ -43,14 +44,14 @@
             goto('/edit');
          }
       } catch(e) {
-         error = e instanceof Error ? e.message : String(e);
+         errorText = e instanceof Error ? e.message : String(e);
       }
    }
 </script>
 
 <main class="column">
-   {#if notif == "OTHER_GAMEVER"}
-      <Notification onOk={() => {notif = ""; pageChange = true; goto('/edit');}}>
+   {#if notifType == "OTHER_GAMEVER"}
+      <Notification onOk={() => {notifType = ""; pageChange = true; goto('/edit');}}>
          This mod was created for a version of Hardware Tycoon other than <strong>{HT_VERSION}</strong>.<br>
          This version of the tool only supports {HT_VERSION}, meaning there may be inconsistencies between what you see here and in the game.<br><br>
          You can change the mod's supported game version in the settings after making sure it works to get rid of this warning.
@@ -65,8 +66,8 @@
       {/if}
       <button class="main-menu-btn" disabled={pageChange} on:click={() => {pageChange = true; goto("/new");}}>New Modification</button>
       <button class="main-menu-btn" disabled={pageChange} on:click={loadMod}>Load Modification</button>
-      {#if error}
-         <p class="error-p">{error}</p>
+      {#if errorText}
+         <p class="error-p">{errorText}</p>
       {/if}
    </div>
 

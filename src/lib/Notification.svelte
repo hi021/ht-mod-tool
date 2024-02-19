@@ -27,7 +27,9 @@
       background-color: rgba(0, 0, 0, 0.125);
    }
    .form {
-      background-color: #eee;
+      background-color: #fff;
       font-size: 1.5rem;
+      width: auto;
+      max-width: 80vw;
    }
 </style>

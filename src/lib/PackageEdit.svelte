@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { parsePackageName } from "./util";
+	import Notification from "./Notification.svelte";
+	import { MAX_RES_X, MAX_RES_Y, parsePackageName } from "./util";
 
    export let editing: App.Package;
    export let research: App.Research | null;
@@ -7,6 +8,7 @@
    export let onCancel: () => void;
 
    const Len_PackageName = 10; //package type max length
+   let notifText = "";
 
    let packageType: "DIP" | "PLCC" | "PGA" | "Custom";
    let packageName: "DIP" | "PLCC" | "PGA" | string; //may only contain letters
@@ -35,8 +37,34 @@
             {category: packageType, cost: 5000, name: packageName, reqRes: 1, res: 0, resPoints: 100, tab: "CPU", x: 0, xp: 100, y: 0, year: 1980}
          editing.res = 0; //needs research
       }
-   } 
+   }
+
+   function onSaveClick() {
+      if(!editing.res && research) {
+         if(research.x > MAX_RES_X) {
+            notifText = `The maximum <strong>X position</strong> in this version of Hardware Tycoon is <strong>${MAX_RES_X}</strong>.<br>No research beyond that point will show up in the game.`;
+            return;
+         }
+         if(research.y > MAX_RES_Y) {
+            notifText = `The maximum <strong>Y position</strong> in this version of Hardware Tycoon is <strong>${MAX_RES_Y}</strong>.<br>No research beyond that point will show up in the game.`;
+            return;
+         }
+
+         if(research.x < 1) research.x = 1;
+      }
+
+      if(editing.maxClock < 200) editing.maxClock = 200;
+      if(Number(editing.maxCore) < 0) editing.maxCore = "0";
+      if(editing.time < 0) editing.time = 0;
+      onSave();
+   }
 </script>
+
+{#if notifText}
+   <Notification onOk={() => {notifText = "";}}>
+      {@html notifText}
+   </Notification>
+{/if}
 
 <div class="form">
    <h3>{editing.name}</h3>
@@ -204,7 +232,7 @@
       <button class="btn-menu btn-menu-cancel" on:click={onCancel}>
          <icon style="background-image: url('/icons/clear.svg');"/>
       </button>
-      <button class="btn-menu btn-menu-confirm" on:click={onSave}>
+      <button class="btn-menu btn-menu-confirm" on:click={onSaveClick}>
          <icon style="background-image: url('/icons/check.svg');"/>
       </button>
    </div>

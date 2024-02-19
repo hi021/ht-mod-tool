@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import PackageEdit from '$lib/PackageEdit.svelte';
-	import { LEN_AUTHOR, LEN_NAME, LEN_VERSION, findResearch, formatNumber, parsePackageName } from '$lib/util';
+	import { GAME_RESEARCH, LEN_AUTHOR, LEN_NAME, LEN_VERSION, findResearch, formatNumber, parsePackageName } from '$lib/util';
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
     import { save } from '@tauri-apps/api/dialog';
@@ -10,12 +10,13 @@
 	import RdPreview from '$lib/RDPreview.svelte';
 	import { slide } from 'svelte/transition';
 	import { getVersion } from '@tauri-apps/api/app';
+	import Notification from '$lib/Notification.svelte';
 
-    let error = ""; //message
+    let errorText = "";
+    let notifText = "";
     const MOD: Writable<App.ModData> = getContext('MOD');
-    console.log($MOD);
     let packagesSorted: App.Package[] = JSON.parse(JSON.stringify($MOD?.packages ?? []));
-    let sortedBy = "default"; //column name or no. as default
+    let sortedBy = "default"; //field name or package no. as default
     let sortedAsc = false;
 
     function sortPackages() {
@@ -29,9 +30,7 @@
         packagesSorted = packagesSorted.sort((a: Record<string, any>, b: Record<string, any>) =>
                             a[sortedBy] < b[sortedBy] ? sortedAsc ? 1 : -1 : sortedAsc ? -1 : 1);
     }
-
-    $: sortedBy, sortedAsc, sortPackages();
-
+    
     function setSortedBy(field: string) {
         if(sortedBy == field) {
             sortedAsc = !sortedAsc;
@@ -40,6 +39,8 @@
         sortedAsc = false;
         sortedBy = field;
     }
+
+    $: sortedBy, sortedAsc, sortPackages();
     
     let lastScroll = 0; //used to set scroll back to last position after editing
     let editingIndex: number | null = null;
@@ -59,35 +60,44 @@
     }
 
     function onPackageEditSave() {
-        if(editingIndex != null) {
-            const oldPckg = $MOD.packages[editingIndex];
-            const oldRes = findResearch($MOD.research, oldPckg.name);
-
-            //check for invalid name
-            if(!editingPackage!.name.length || !parsePackageName(editingPackage!.name) || editingPackage!.name.includes("|") || editingPackage!.name.includes(";")) {
-                return;
-            }
-            //check for duplicates
-            if($MOD.packages.findIndex((p) => p.name == editingPackage!.name) != editingIndex) {
-                return;
-            }
-            
-            if(editingPackage!.res < 2) {
-                //has research
-                editingResearch!.name = editingPackage!.name; //edit research name in case it was changed
-                if(!$MOD.research) $MOD.research = [];
-                if(!oldRes) $MOD.research.push(editingResearch as App.Research); //add new research
-                else $MOD.research[oldRes.id] = editingResearch as App.Research; //edit existing research
-            } else {
-                //doesn't have research anymore
-                if(oldRes && $MOD.research?.length)
-                    $MOD.research = $MOD.research.filter((r, i) => i != oldRes.id) //remove research
-            }
-
-            $MOD.packages[editingIndex] = editingPackage as App.Package;
-            packagesSorted = JSON.parse(JSON.stringify($MOD.packages));
-            sortPackages();
+        if(editingIndex == null) {
+            exitEdit();
+            return;
         }
+
+        const oldPckg = $MOD.packages[editingIndex];
+        const oldRes = findResearch($MOD.research, oldPckg.name);
+
+        //check for invalid name
+        if(!editingPackage!.name.length || editingPackage!.name.length > 21 || !parsePackageName(editingPackage!.name) || editingPackage!.name.includes("|") || editingPackage!.name.includes(";")) {
+            notifText = "The package name is invalid!<br>It may only contain alphanumeric characters, () brackets, and '!' '@' '#' '$' '%' '^' '&' '*' '-' '_' '=' '+' '.' ',' '?' '/' symbols."
+            return;
+        }
+        //check for duplicates
+        const duplicateNameIndex = $MOD.packages.findIndex((p) => p.name == editingPackage!.name);
+        const duplicateNameIndexGame = GAME_RESEARCH.findIndex((r) => r.name == editingPackage!.name && r.tab == "CPU");
+        if((duplicateNameIndex != -1 && duplicateNameIndex != editingIndex) || duplicateNameIndexGame != -1) {
+            notifText = "A package with the same name already exists."
+            notifText = editingIndex + "      " + $MOD.packages.findIndex((p) => p.name == editingPackage!.name)
+            return;
+        }
+        
+        if(editingPackage!.res < 2) {
+            //has research
+            editingResearch!.name = editingPackage!.name; //edit research name in case it was changed
+            if(!$MOD.research) $MOD.research = [];
+            if(!oldRes) $MOD.research.push(editingResearch as App.Research); //add new research
+            else $MOD.research[oldRes.id] = editingResearch as App.Research; //edit existing research
+        } else {
+            //doesn't have research anymore
+            if(oldRes && $MOD.research?.length)
+                $MOD.research = $MOD.research.filter((r, i) => i != oldRes.id) //remove research
+        }
+
+        $MOD.packages[editingIndex] = editingPackage as App.Package;
+        packagesSorted = JSON.parse(JSON.stringify($MOD.packages));
+        sortPackages();
+
         exitEdit();
     }
 
@@ -206,7 +216,7 @@
             if(!path) return; //canceled
             await writeTextFile(path, formatHtMod($MOD));
         } catch(e) {
-            error = e instanceof Error ? e.message : String(e);
+            errorText = e instanceof Error ? e.message : String(e);
         }
     }
 </script>
@@ -218,8 +228,13 @@
         <small>[{$MOD.meta?.version}]</small>
     </h2>
 {/if}
-{#if error}
-    <p class="error-p">{error}</p>
+{#if errorText}
+    <p class="error-p">{errorText}</p>
+{/if}
+{#if notifText}
+   <Notification onOk={() => {notifText = "";}}>
+      {@html notifText}
+   </Notification>
 {/if}
 
 <main class="row flex-fill">
