@@ -30,7 +30,7 @@ declare global {
 			perf: number; //performance
 			stab: number; //stability
 			build: number;
-			res: number; //whether researched (0 - needs research, 1 - available)
+			res: 0 | 1; //whether researched (0 - needs research, 1 - available)
 			maxClock: number; //kHz
 			maxCore: string; //highest supported core index ("0" - "5")
 			img: string; //image name (eg. PLCC24)
@@ -47,7 +47,7 @@ declare global {
 			y: number; //position on R&D screen
 		}
 		interface Research extends BaseResearch {
-			res: number; //whether researched (0 - locked, 1 - unlocked, 2 - researched)
+			res: 0 | 1 | 2; //whether researched (0 - locked, 1 - unlocked, 2 - researched)
 			reqRes: number; //whether required tech is researched(? unused)
 		}
 	}

@@ -6,7 +6,7 @@
    export let onCancel: () => void;
 </script>
 
-<div class="form column-center">
+<form class="form column-center">
    <label class="label-long">
       Mod name
       <input type="text" maxlength="{LEN_NAME}" bind:value={meta.name}>
@@ -37,11 +37,11 @@
    {/if}
 
    <div class="row btn-row">
-      <button class="btn-none btn-menu btn-menu-cancel" on:click={onCancel}>
+      <button class="btn-none btn-menu btn-menu-cancel" type="button" on:click={onCancel}>
          <icon style="background-image: url('/icons/clear.svg');"/>
       </button>
-      <button class="btn-none btn-menu btn-menu-confirm" on:click={onSave}>
+      <button class="btn-none btn-menu btn-menu-confirm" type="submit" on:click={onSave}>
          <icon style="background-image: url('/icons/check.svg');"/>
       </button>
    </div>
-</div>
+</form>

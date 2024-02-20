@@ -66,7 +66,7 @@
    </Notification>
 {/if}
 
-<div class="form">
+<form class="form">
    <h3>{editing.name}</h3>
 
    <div class="row" style="justify-content: space-around; width: 100%;">
@@ -90,7 +90,7 @@
       </div>
 
       <div class="row-center">
-         <label>
+         <label class="tooltip" data-tooltip="The appearance of any CPU using this package">
             Image
             <select bind:value={editing.img}>
                <option>DIP14</option>
@@ -153,39 +153,40 @@
          <span><strong>{Math.round((editing.perf + editing.stab + editing.build) / editing.unit*100)/100}</strong> score/cost</span>
       </fieldset>
 
-      
       <div class="column" style="width: {editing.res < 1 ? "auto" : "290.08px"};">
          {#if research && editing.res < 1}
             <fieldset class="column research-fieldset">
             <legend>Research</legend>
                <div class="row">
-                  <label title="Fixed one-time cost at the beginning of the research">
+                  <label class="tooltip" data-tooltip="Fixed one-time cost at the beginning of the research">
                      Research cost
                      <input type="number" min="0" max="1000000000" step="1" placeholder="in $" bind:value={research.cost}>
                   </label>
-                  <label title="Research points necessary to finish researching the technology">
+                  <label class="tooltip" data-tooltip="Research points necessary to finish researching the technology">
                      Research points
                      <input type="number" min="0" max="1000000" step="1" bind:value={research.resPoints}>
                   </label>
                </div>
                <div class="row">
-                  <label title="CPU experience required to unlock the research">
+                  <label class="tooltip" data-tooltip="CPU experience required to unlock the research">
                      Required exp
                      <input type="number" min="0" max="1000000" step="1" bind:value={research.xp}>
                   </label>
-                  <label title="Earliest year the package is possible to research">
+                  <label class="tooltip" data-tooltip="Earliest year the package can be researched">
                      Unlock year
                      <input type="number" min="0" max="10000" step="1" bind:value={research.year}>
                   </label>
                </div>
                <div class="row">
-                  <label title="R&D Position, where 1 = width of one research box">
+                  <label class="tooltip" data-tooltip="Horizontal R&D Position
+1 = width of one research box plus margin">
                      X position
                      <input type="number" min="0" max="200" step="0.01" bind:value={research.x}>
                   </label>
-                  <label title="R&D Position, where 1 = width of one research box">
+                  <label class="tooltip" data-tooltip="Vertical R&D Position
+1 = height of one research box plus margin">
                      Y position
-                     <input type="number" min="0" max="19" step="0.01" bind:value={research.y}>
+                     <input type="number" min="0" max="20" step="0.01" bind:value={research.y}>
                   </label>
                </div>
             </fieldset>
@@ -200,7 +201,7 @@
 
    <fieldset class="row" style="margin-top: 4px;">
       <legend>Limitations</legend>
-         <label>
+         <label class="tooltip" data-tooltip="Highest supported clock speed in kHz">
             Max clock
             <input type="number" min="200" max="1000000000000" step="1" placeholder="in kHz" bind:value={editing.maxClock}>
             <small>
@@ -215,7 +216,7 @@
                {/if}
             </small>
          </label>
-         <label>
+         <label class="tooltip" data-tooltip="Highest supported CPU core configuration">
             Supported core
             <select bind:value={editing.maxCore}>
                <option value="0">Single-core</option>
@@ -229,14 +230,14 @@
    </fieldset>
 
    <div class="row btn-row">
-      <button class="btn-menu btn-menu-cancel" on:click={onCancel}>
+      <button class="btn-menu btn-menu-cancel" type="button" on:click={onCancel}>
          <icon style="background-image: url('/icons/clear.svg');"/>
       </button>
-      <button class="btn-menu btn-menu-confirm" on:click={onSaveClick}>
+      <button class="btn-menu btn-menu-confirm" type="submit" on:click={onSaveClick}>
          <icon style="background-image: url('/icons/check.svg');"/>
       </button>
    </div>
-</div>
+</form>
 
 <style>
    .form {

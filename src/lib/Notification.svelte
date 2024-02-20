@@ -10,7 +10,7 @@
 
       <div class="row btn-row">
          <div/>
-         <button class="btn-menu btn-menu-confirm" on:click={onOk}>
+         <button class="btn-menu btn-menu-confirm" type="button" on:click={onOk}>
             <icon style="background-image: url('/icons/check.svg');"/>
          </button>
       </div>
@@ -18,14 +18,6 @@
 </div>
 
 <style>
-   .overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.125);
-   }
    .form {
       background-color: #fff;
       font-size: 1.5rem;

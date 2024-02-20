@@ -20,8 +20,6 @@
     let sortedAsc = false;
 
     function sortPackages() {
-        if(!packagesSorted?.length) return;
-        
         if(sortedBy == "default") {
             packagesSorted = JSON.parse(JSON.stringify($MOD.packages));
             if(sortedAsc) packagesSorted = packagesSorted.reverse();
@@ -78,11 +76,11 @@
         const duplicateNameIndexGame = GAME_RESEARCH.findIndex((r) => r.name == editingPackage!.name && r.tab == "CPU");
         if((duplicateNameIndex != -1 && duplicateNameIndex != editingIndex) || duplicateNameIndexGame != -1) {
             notifText = "A package with the same name already exists."
-            notifText = editingIndex + "      " + $MOD.packages.findIndex((p) => p.name == editingPackage!.name)
+            notifText = editingIndex + "      " + $MOD.packages.findIndex((p) => p.name == editingPackage!.name) //TODO
             return;
         }
         
-        if(editingPackage!.res < 2) {
+        if(editingPackage!.res < 1) {
             //has research
             editingResearch!.name = editingPackage!.name; //edit research name in case it was changed
             if(!$MOD.research) $MOD.research = [];
@@ -178,8 +176,9 @@
 
     function addPackage() {
         $MOD.packages.push(
-            {build: 0, cost: 1000, img: "DIP14", maxClock: 5000, maxCore: "0", name: "DIP14", perf: 0, res: 2, stab: 0, time: 5, unit: 10}
+            {build: 0, cost: 1000, img: "DIP14", maxClock: 5000, maxCore: "0", name: "14 pin DIP", perf: 0, res: 1, stab: 0, time: 5, unit: 10}
         )
+        sortPackages();
         edit($MOD.packages.length - 1);
     }
 

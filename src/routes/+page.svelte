@@ -49,6 +49,10 @@
    }
 </script>
 
+{#if pageChange}
+   <div class="overlay">
+   </div>
+{/if}
 <main class="column">
    {#if notifType == "OTHER_GAMEVER"}
       <Notification onOk={() => {notifType = ""; pageChange = true; goto('/edit');}}>
@@ -110,6 +114,9 @@
       color: var(--color-lightest);
       box-shadow: none;
       outline: none;
+   }
+   .main-menu-btn[disabled] {
+      opacity: 1;
    }
 
    a {

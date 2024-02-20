@@ -16,6 +16,7 @@
 
     async function createMod() {
         errors = {name: false, author: false, version: false, gameVersion: false};
+        errorMsg = "";
 
         name = name.trim().slice(0, LEN_NAME);
         author = author.trim().slice(0, LEN_AUTHOR);
@@ -63,27 +64,27 @@
     <form class="form column-center">
         <label class="label-long">
             Mod name
-            <input type="text" class:error={errors.name} id="mod_name" name="mod name" on:change={() => errors.name = false}
-                    maxlength="{LEN_NAME}" spellcheck="false" bind:value={name}>
+            <input type="text" class:error={errors.name} name="mod name" on:change={() => errors.name = false}
+                    autocomplete="off" maxlength="{LEN_NAME}" spellcheck="false" bind:value={name}>
             <div class="bar-length" style="width: {name.length/LEN_NAME * 100}%;"></div>
             <small class="text-length">{name.length}/{LEN_NAME}</small>
         </label>
         <label class="label-long">
             Mod authors' names
-            <input type="text" class:error={errors.author} id="mod_author" name="mod author" on:change={() => errors.author = false}
-                    maxlength="{LEN_AUTHOR}" spellcheck="false" bind:value={author}>
+            <input type="text" class:error={errors.author} name="mod author" on:change={() => errors.author = false}
+                    autocomplete="off" maxlength="{LEN_AUTHOR}" spellcheck="false" bind:value={author}>
             <div class="bar-length" style="width: {author.length/LEN_AUTHOR * 100}%;"></div>
             <small class="text-length">{author.length}/{LEN_AUTHOR}</small>
         </label>
         <label>
             Mod version
-            <input type="text" class:error={errors.version} id="mod_version" name="mod version" on:change={() => errors.version = false}
-                    autocomplete="new-password" maxlength="{LEN_VERSION}" spellcheck="false" bind:value={version}>
+            <input type="text" class:error={errors.version} name="mod version" on:change={() => errors.version = false}
+                    autocomplete="off" maxlength="{LEN_VERSION}" spellcheck="false" bind:value={version}>
             <small class="text-length">{version.length}/{LEN_VERSION}</small>
         </label>
         <label>
             Hardware Tycoon version
-            <select id="game_version" class:error={errors.gameVersion} name="game version" on:change={() => errors.gameVersion = false}
+            <select class:error={errors.gameVersion} name="game version" on:change={() => errors.gameVersion = false}
                     bind:value={gameVersion}>
                 <option>{HT_VERSION}</option>
             </select>
@@ -113,12 +114,6 @@
         background-color: var(--color-ht-primary);
         max-width: 100%;
         height: 5px;
-    }
-
-    input, select {
-        border: none;
-        background-color: rgba(255,255,255, 0.5);
-        border-radius: 0;
     }
     
     .error {

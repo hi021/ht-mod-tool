@@ -10,29 +10,9 @@
 
 	--color-highlight-purple: #311b92;
 	--color-highlight-blue: #90caf9;
-	/*
-	--color-bg-dark: #424242;
-	--color-bg-light: #bdbdbd;
-	--color-bg: rgb(237, 240, 248);
-	--color-bg-blue: rgb(221, 241, 248); */
 
 	--color-ht-primary: rgb(33, 150, 243);
 	--color-ht-secondary: rgb(100, 181, 246);
-
-	/* Buttons */
-	--color-blue: 210, 79%, 46%;
-	--color-green: 123, 43%, 39%;
-	--color-red: 354, 79%, 46%;
-	--color-orange: 35, 96%, 50%;
-	--color-yellow: 53, 84%, 60%;
-	--color-gray: 0, 0%, 58%;
-
-	--color-blue-h: 210, 79%, 56%;
-	--color-green-h: 123, 43%, 49%;
-	--color-red-h: 354, 79%, 56%;
-	--color-orange-h: 35, 96%, 62%;
-	--color-yellow-h: 55, 100%, 74%;
-	--color-gray-h: 0, 0%, 68%;
 
 	--outline-shadow: 1px 1px 2px 0 #000;
 }
@@ -67,7 +47,7 @@ select,
 textarea {
 	margin-bottom: 0;
 	padding: 4px;
-	border-radius: 0.25rem;
+	border-radius: 4px;
 	font-weight: 400;
 	background-color: #fff;
 	-webkit-background-clip: padding-box;
@@ -84,7 +64,7 @@ select:focus,
 textarea:focus {
 	border-color: #80bdff;
 	outline: 0;
-	box-shadow: 0 0 0 0.15rem rgba(0, 123, 255, 0.25);
+	box-shadow: 0 0 0 0.15rem rgba(0, 100, 255, 0.25);
 }
 input[disabled],
 select[disabled],
@@ -104,7 +84,7 @@ button {
 	align-items: center;
 	--clr: var(--color-gray);
 	text-decoration: none;
-	border-radius: 0.4rem;
+	border-radius: 6px;
 	border-style: solid;
 	background-color: hsl(var(--clr));
 	border-color: hsl(var(--clr));
@@ -148,43 +128,6 @@ button[disabled] {
 .btn-hover-highlight:hover,
 .btn-hover-highlight:focus {
 	opacity: 1;
-}
-
-.btn-blue {
-	--clr: var(--color-blue);
-}
-.btn-blue:not([disabled]):hover {
-	background-color: hsl(var(--color-blue-h));
-}
-.btn-green {
-	--clr: var(--color-green);
-}
-.btn-green:not([disabled]):hover {
-	background-color: hsl(var(--color-green-h));
-}
-.btn-gray {
-	--clr: var(--color-gray);
-}
-.btn-gray:not([disabled]):hover {
-	background-color: hsl(var(--color-gray-h));
-}
-.btn-red {
-	--clr: var(--color-red);
-}
-.btn-red:not([disabled]):hover {
-	background-color: hsl(var(--color-red-h));
-}
-.btn-orange {
-	--clr: var(--color-orange);
-}
-.btn-orange:not([disabled]):hover {
-	background-color: hsl(var(--color-orange-h));
-}
-.btn-yellow {
-	--clr: var(--color-yellow);
-}
-.btn-yellow:not([disabled]):hover {
-	background-color: hsl(var(--color-yellow-h));
 }
 
 input[type="checkbox"] {
@@ -237,7 +180,7 @@ input[type="checkbox"] {
 /* ELEMENTS */
 fieldset {
 	border: 1px solid rgba(0, 0, 0, 0.2);
-	border-radius: 3px;
+	border-radius: 2px;
 }
 
 hr {
@@ -362,6 +305,11 @@ icon {
 	background-color: rgba(255, 255, 255, 0.3);
 	box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.275);
 }
+.form :is(input, select) {
+	border: none;
+	background-color: rgba(255, 255, 255, 0.5);
+	border-radius: 0;
+}
 .form label {
 	margin: 4px;
 	margin-bottom: 12px;
@@ -377,10 +325,20 @@ icon {
 	min-width: 70%;
 }
 
+.overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.125);
+}
+
 .error-p {
-	color: var(--color-highlight-purple);
+	color: #000;
 	font-weight: 600;
 	padding: 0.25rem;
+	text-align: center;
 	background-color: rgba(255, 20, 60, 0.6);
 }
 
