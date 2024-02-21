@@ -76,7 +76,6 @@
         const duplicateNameIndexGame = GAME_RESEARCH.findIndex((r) => r.name == editingPackage!.name && r.tab == "CPU");
         if((duplicateNameIndex != -1 && duplicateNameIndex != editingIndex) || duplicateNameIndexGame != -1) {
             notifText = "A package with the same name already exists."
-            notifText = editingIndex + "      " + $MOD.packages.findIndex((p) => p.name == editingPackage!.name) //TODO
             return;
         }
         
@@ -155,6 +154,7 @@
         const originalId = $MOD.packages.findIndex((p) => p.name == pckg.name);
         packagesSorted.splice(id, 1);
         lastDeleted = {pckg: $MOD.packages.splice(originalId, 1)[0], id, res: deletedResearch};
+        if(lastDeletedTimeout) clearTimeout(lastDeletedTimeout);
         lastDeletedTimeout = setTimeout(() => lastDeleted = null, 10000);
 
         $MOD = $MOD;
@@ -525,6 +525,7 @@
         background-color: rgba(255, 255, 255, 0.8);
     }
     .bottom-notif .btn-menu-rect {
+        padding: 3px;
         margin-left: 8px;
         background-color: var(--color-ht-secondary);
     }

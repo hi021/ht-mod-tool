@@ -5,6 +5,7 @@
 
 	const MOD: Writable<App.ModData> = writable();
 	setContext('MOD', MOD);
+	document.addEventListener('contextmenu', e => e.preventDefault());
 </script>
 
 <slot />
