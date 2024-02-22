@@ -525,8 +525,9 @@
         background-color: rgba(255, 255, 255, 0.8);
     }
     .bottom-notif .btn-menu-rect {
-        padding: 3px;
+        padding: 4px;
         margin-left: 8px;
+        font-weight: 500;
         background-color: var(--color-ht-secondary);
     }
     .bottom-notif .btn-menu-rect:hover {
