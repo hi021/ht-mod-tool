@@ -50,8 +50,7 @@
 </script>
 
 {#if pageChange}
-   <div class="overlay">
-   </div>
+   <div class="overlay"></div>
 {/if}
 <main class="column">
    {#if notifType == "OTHER_GAMEVER"}

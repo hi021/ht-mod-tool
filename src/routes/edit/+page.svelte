@@ -186,7 +186,7 @@
         `${p.name}|${p.cost}|${p.time}|${p.unit}|${p.perf}|${p.stab}|${p.build}|${p.res}|${p.maxClock}|${p.maxCore}|${p.img};`
 
     const formatResearch = (r: App.Research) =>
-        `${r.name}|${r.tab}|${r.category}|${r.cost}|${r.resPoints}|${r.xp}|${r.year}|${r.x}|1|${r.y};` //TODO
+        `${r.name}|${r.tab}|${r.category}|${r.cost}|${r.resPoints}|${r.xp}|${r.year}|${r.res}|${r.x}|${r.reqRes}|${r.y};`
 
     function formatHtMod(mod: App.ModData) {
         let string = `[Author: ${mod.meta.author}][Name: ${mod.meta.name}][Mod Version: ${mod.meta.version}][Supported Version: ${mod.meta.gameVersion}][Tool Version: ${mod.meta.toolVersion}]\n`
@@ -317,7 +317,7 @@
                         <td>{formatNumber(pckg.build)}</td>
                         <td>
                             {#if pckg.res < 1}
-                            <icon class="tooltip" data-tooltip="Has associated research" style="background-image: url('/icons/science.svg');"/>
+                            <icon class="tooltip tooltip-left" data-tooltip="Has associated research" style="background-image: url('/icons/science.svg');"/>
                             {/if}
                         </td>
                         <td>

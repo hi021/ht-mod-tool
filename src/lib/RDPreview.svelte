@@ -5,7 +5,6 @@
 	import { GAME_RESEARCH, findResearch } from './util';
 
    export let onExit: () => void;
-//TODO: SLIDER STYLE!
    const MOD: Writable<App.ModData> = getContext('MOD');
 
    //assume all unresearched packages have associated research
@@ -71,5 +70,20 @@
    .btn-circle:focus {
       background-color: rgba(0,0,0, 0.25);
       box-shadow: none;
+   }
+
+   ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+   }
+   ::-webkit-scrollbar-track,
+   ::-webkit-scrollbar-corner {
+	   background: #efefef;
+   }
+   ::-webkit-scrollbar-thumb {
+      background: #ddd;
+   }
+   ::-webkit-scrollbar-thumb:hover {
+      background: #ababab;
    }
 </style>

@@ -169,43 +169,21 @@ input[type="checkbox"] {
 }
 
 /* SCROLLBAR */
-.scrollbar-dark,
-.scrollbar-small {
-	scrollbar-color: #222 var(--color-dark);
-}
-/* apparently something must be in here for other styles to work */
-.scrollbar-dark::-webkit-scrollbar,
-.scrollbar-small::-webkit-scrollbar {
+::-webkit-scrollbar {
 	display: initial;
 }
-.scrollbar-dark::-webkit-scrollbar-track {
-	background: var(--color-dark);
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+	background: #555;
 }
-.scrollbar-dark::-webkit-scrollbar-thumb {
-	background: #222;
-}
-.scrollbar-dark::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb {
 	background: #333;
 }
-.scrollbar-dark::-webkit-scrollbar-button,
-.scrollbar-small::-webkit-scrollbar-button {
+::-webkit-scrollbar-thumb:hover {
+	background: #222;
+}
+::-webkit-scrollbar-button {
 	display: none;
-}
-
-.scrollbar-small::-webkit-scrollbar {
-	width: 10px;
-	height: 10px;
-}
-.scrollbar-small::-webkit-scrollbar-track {
-	background: rgba(0, 0, 0, 0.2);
-	border-radius: 999px;
-}
-.scrollbar-small::-webkit-scrollbar-thumb {
-	background: rgba(0, 0, 0, 0.3);
-	border-radius: 999px;
-}
-.scrollbar-small::-webkit-scrollbar-thumb:hover {
-	background: rgba(0, 0, 0, 0.4);
 }
 
 /* ELEMENTS */
@@ -297,15 +275,17 @@ icon {
 	max-width: 25vh;
 	background: var(--tooltip-color);
 	white-space: break-spaces;
-	transform: translate(-50%, calc(-100% - var(--arrow-size)));
+	transform: translateY(calc(-100% - var(--arrow-size)));
 	transform-origin: bottom center;
 }
-.tooltip.tooltip-abs::before,
-.tooltip.tooltip-center::before {
-	transform: translate(0, calc(-100% - var(--arrow-size) / 2));
+.tooltip.tooltip-abs::before {
+	transform: translateY(calc(-100% - var(--arrow-size) / 2));
 }
 .tooltip.tooltip-bottom::before {
-	transform: translate(0, calc(100% + var(--arrow-size) / 2));
+	transform: translateY(calc(100% + var(--arrow-size)));
+}
+.tooltip.tooltip-left::before {
+	transform: translate(-50%, calc(-100% - var(--arrow-size)));
 }
 /* tooltip arrow */
 .tooltip::after {
