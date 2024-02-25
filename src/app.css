@@ -17,6 +17,37 @@
 	--outline-shadow: 1px 1px 2px 0 #000;
 }
 
+@font-face {
+	font-family: "Lato";
+	src: url(/font/Lato-Thin.ttf) format("truetype");
+	font-style: normal;
+	font-weight: 100;
+}
+@font-face {
+	font-family: "Lato";
+	src: url(/font/Lato-Light.ttf) format("truetype");
+	font-style: normal;
+	font-weight: 300;
+}
+@font-face {
+	font-family: "Lato";
+	src: url(/font/Lato-Regular.ttf) format("truetype");
+	font-style: normal;
+	font-weight: 400;
+}
+@font-face {
+	font-family: "Lato";
+	src: url(/font/Lato-Bold.ttf) format("truetype");
+	font-style: normal;
+	font-weight: 500;
+}
+@font-face {
+	font-family: "Lato";
+	src: url(/font/Lato-Italic.ttf) format("truetype");
+	font-style: italic;
+	font-weight: 400;
+}
+
 html,
 body,
 main {
@@ -27,7 +58,7 @@ body {
 	background-color: var(--color-ht-secondary);
 	color: var(--color-darker);
 
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+	font-family: Raleway, -apple-system, BlinkMacSystemFont, "Segoe UI", Lato, Helvetica, Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
@@ -269,7 +300,8 @@ icon {
 	transform: translate(-50%, calc(-100% - var(--arrow-size)));
 	transform-origin: bottom center;
 }
-.tooltip.tooltip-abs::before {
+.tooltip.tooltip-abs::before,
+.tooltip.tooltip-center::before {
 	transform: translate(0, calc(-100% - var(--arrow-size) / 2));
 }
 .tooltip.tooltip-bottom::before {

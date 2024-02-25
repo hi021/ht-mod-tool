@@ -153,7 +153,7 @@
          <span><strong>{Math.round((editing.perf + editing.stab + editing.build) / editing.unit*100)/100}</strong> score/cost</span>
       </fieldset>
 
-      <div class="column" style="width: {editing.res < 1 ? "auto" : "290.08px"};">
+      <div class="column" style="width: {editing.res < 1 ? "auto" : "288.08px"};">
          {#if research && editing.res < 1}
             <fieldset class="column research-fieldset">
             <legend>Research</legend>
@@ -179,14 +179,16 @@
                </div>
                <div class="row">
                   <label class="tooltip" data-tooltip="Horizontal R&D Position
-1 = width of one research box plus margin">
+1 = width of one research box plus margin
+(1-{MAX_RES_X})">
                      X position
                      <input type="number" min="0" max="200" step="0.01" bind:value={research.x}>
                   </label>
                   <label class="tooltip" data-tooltip="Vertical R&D Position
-1 = height of one research box plus margin">
+1 = height of one research box plus margin
+(0-{MAX_RES_Y}, 0 = default row based on package type)">
                      Y position
-                     <input type="number" min="0" max="20" step="0.01" bind:value={research.y}>
+                     <input type="number" min="0" max="100" step="0.01" bind:value={research.y}>
                   </label>
                </div>
             </fieldset>
@@ -201,7 +203,7 @@
 
    <fieldset class="row" style="margin-top: 4px;">
       <legend>Limitations</legend>
-         <label class="tooltip" data-tooltip="Highest supported clock speed in kHz">
+         <label class="tooltip tooltip-center" data-tooltip="Highest supported clock speed in kHz">
             Max clock
             <input type="number" min="200" max="1000000000000" step="1" placeholder="in kHz" bind:value={editing.maxClock}>
             <small>
@@ -216,7 +218,7 @@
                {/if}
             </small>
          </label>
-         <label class="tooltip" data-tooltip="Highest supported CPU core configuration">
+         <label class="tooltip tooltip-center" data-tooltip="Highest supported CPU core configuration">
             Supported core
             <select bind:value={editing.maxCore}>
                <option value="0">Single-core</option>

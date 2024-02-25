@@ -185,8 +185,8 @@
     const formatPackage = (p: App.Package) =>
         `${p.name}|${p.cost}|${p.time}|${p.unit}|${p.perf}|${p.stab}|${p.build}|${p.res}|${p.maxClock}|${p.maxCore}|${p.img};`
 
-    //join entire research object using "|" and replace the last one with ";"
-    const formatResearch = (r: App.Research) => {let s = ""; for(let i in r) s += (r as Record<string,any>)[i] + "|"; return s.replace(/.$/,";");}
+    const formatResearch = (r: App.Research) =>
+        `${r.name}|${r.tab}|${r.category}|${r.cost}|${r.resPoints}|${r.xp}|${r.year}|${r.x}|1|${r.y};` //TODO
 
     function formatHtMod(mod: App.ModData) {
         let string = `[Author: ${mod.meta.author}][Name: ${mod.meta.name}][Mod Version: ${mod.meta.version}][Supported Version: ${mod.meta.gameVersion}][Tool Version: ${mod.meta.toolVersion}]\n`

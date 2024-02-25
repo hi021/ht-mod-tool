@@ -5,7 +5,7 @@
 	import { GAME_RESEARCH, findResearch } from './util';
 
    export let onExit: () => void;
-
+//TODO: SLIDER STYLE!
    const MOD: Writable<App.ModData> = getContext('MOD');
 
    //assume all unresearched packages have associated research
@@ -31,7 +31,7 @@
             
       {#if userResearchPackages}
          {#each userResearchPackages as pckg}
-            <RdTechnology res={userResearch[pckg.name]} img={pckg.img}/>
+            <RdTechnology isMod={true} res={userResearch[pckg.name]} img={pckg.img}/>
          {/each}
       {/if}
    </div>

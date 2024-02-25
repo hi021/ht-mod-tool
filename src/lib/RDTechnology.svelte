@@ -3,10 +3,11 @@
 
    export let res: App.BaseResearch;
    export let img: string | undefined = undefined; //package image name
+   export let isMod = false; //whether is a part of a mod
 
    let y = res.y;
    const x = res.x - 1;
-   const size = 84; //excluding 2px border | original sizes are box: 73, img: 41, fullSize: 90
+   const size = 84; //excluding 2px border | original sizes are: box - 73, img - 41, fullSize - 90px
    const fullSize = size + 18; //spacing
    const pad = 24; //padding inside bg container
    const parsedName = parsePackageName(res.name);
@@ -83,7 +84,7 @@
    }
 </script>
 
-<div class="box column-center tooltip tooltip-abs" class:tooltip-bottom={y == 0}
+<div class="box column-center tooltip tooltip-abs" class:tooltip-bottom={y == 0} class:mod-research={isMod}
      style="top: {pad + fullSize*y}px; left: {pad + fullSize*x}px; min-width: {size}px; min-height: {size}px;"
 data-tooltip="{res.name}
 Cost: ${res.cost}
@@ -110,6 +111,9 @@ Min. {res.xp} xp, Y{res.year}">
       position: absolute;
       background-color: #fff;
       border: 2px solid #bbb;
+   }
+   .mod-research {
+      border-color: rgb(10, 90, 45);
    }
    .image {
       width: 46px;
