@@ -34,7 +34,7 @@
       }
       else {
          if(!research) research =
-            {category: packageType, cost: 5000, name: packageName, reqRes: 1, res: 0, resPoints: 100, tab: "CPU", x: 0, xp: 100, y: 0, year: 1980}
+            {category: packageType, cost: 5000, name: packageName, reqRes: 1, res: 1, resPoints: 100, tab: "CPU", x: 0, xp: 100, y: 0, year: 1970}
          editing.res = 0; //needs research
       }
    }
@@ -56,6 +56,12 @@
       if(editing.maxClock < 200) editing.maxClock = 200;
       if(Number(editing.maxCore) < 0) editing.maxCore = "0";
       if(editing.time < 0) editing.time = 0;
+
+      if(numPins < 2 || numPins > 9999) {
+         notifText = "Pin count must be between <strong>2</strong> and <strong>9999</strong>!"
+         return;
+      }
+
       onSave();
    }
 </script>
@@ -168,7 +174,7 @@
                   </label>
                </div>
                <div class="row">
-                  <label class="tooltip" data-tooltip="CPU experience required to unlock the research">
+                  <label class="tooltip" data-tooltip="CPU experience required to unlock the research (100 exp = 1 level)">
                      Required exp
                      <input type="number" min="0" max="1000000" step="1" bind:value={research.xp}>
                   </label>

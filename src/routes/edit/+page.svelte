@@ -67,8 +67,13 @@
         const oldRes = findResearch($MOD.research, oldPckg.name);
 
         //check for invalid name
-        if(!editingPackage!.name.length || editingPackage!.name.length > 21 || !parsePackageName(editingPackage!.name) || editingPackage!.name.includes("|") || editingPackage!.name.includes(";")) {
-            notifText = "The package name is invalid!<br>It may only contain alphanumeric characters, () brackets, and '!' '@' '#' '$' '%' '^' '&' '*' '-' '_' '=' '+' '.' ',' '?' '/' symbols."
+        if(editingPackage!.name.length < 1) {
+            notifText = "The package name must not be blank!"
+            return;
+        }
+        const parsedName = parsePackageName(editingPackage!.name);
+        if(editingPackage!.name.length > 21 || !parsedName || editingPackage!.name.includes("|") || editingPackage!.name.includes(";")) {
+            notifText = "The package name is invalid!<br>It may only contain alphanumeric characters, () parentheses, and '!' '@' '#' '$' '%' '^' '&' '*' '-' '_' '=' '+' '.' ',' '?' '/' symbols."
             return;
         }
         //check for duplicates
@@ -446,14 +451,15 @@
     }
     .package-add-item > button {
         width: 100%;
-        background-color: rgba(174, 213, 129, 0.5);
+        background-color: rgba(174, 213, 129, 0.475);
         font-size: 1.5rem;
         padding: 6px;
         border: none;
         border-radius: 0;
         margin-top: 8px;
     }
-    .package-add-item > button:hover {
+    .package-add-item > button:hover,
+    .package-add-item > button:focus {
         background-color: rgba(174, 213, 129, 1);
     }
 
@@ -467,7 +473,7 @@
         user-select: none;
         box-shadow: 3px 0 2px rgba(0,0,0, 0.25);
         transition: background 0.2s ease-out;
-        z-index: 3;
+        z-index: 5;
     }
     aside > ul {
         list-style: none;

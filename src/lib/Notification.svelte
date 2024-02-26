@@ -22,6 +22,9 @@
       background-color: #fff;
       font-size: 1.5rem;
       width: auto;
-      max-width: 80vw;
+      max-width: 68vw;
+   }
+   .overlay {
+      z-index: 4;
    }
 </style>

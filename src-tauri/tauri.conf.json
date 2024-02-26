@@ -45,12 +45,12 @@
 				"fullscreen": false,
 				"center": true,
 				"height": 720,
-				"minHeight": 300,
+				"minHeight": 400,
 				"resizable": true,
 				"maximizable": true,
 				"title": "HT Mod Tool",
 				"width": 1280,
-				"minWidth": 420,
+				"minWidth": 600,
 				"transparent": false,
 				"fileDropEnabled": false
 			}

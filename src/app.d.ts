@@ -1,5 +1,3 @@
-// See https://kit.svelte.dev/docs/types#app
-// for information about these interfaces
 declare global {
 	namespace App {
 		// interface Error {}
@@ -30,15 +28,15 @@ declare global {
 			perf: number; //performance
 			stab: number; //stability
 			build: number;
-			res: 0 | 1; //whether researched (0 - needs research, 1 - available)
+			res: 0 | 1; //whether researched (0 - has to be researched, 1 - available in design)
 			maxClock: number; //kHz
 			maxCore: string; //highest supported core index ("0" - "5")
-			img: string; //image name (eg. PLCC24)
+			img: string; //image name (e.g. PLCC24)
 		}
 		interface BaseResearch {
-			name: string;
-			tab: string; //CPU or Tech
-			category: string; //eg. DIP, PLCC, Core
+			name: string; //must match package name
+			tab: string; //CPU or Tech (always CPU in this case)
+			category: string; //e.g. DIP, Clock, Core (DIP, PLCC, PGA or Custom in this case)
 			cost: number;
 			resPoints: number;
 			xp: number; //required cpu xp to unlock
@@ -47,8 +45,8 @@ declare global {
 			y: number; //position on R&D screen
 		}
 		interface Research extends BaseResearch {
-			res: 0 | 1 | 2; //whether researched (0 - locked, 1 - unlocked, 2 - researched)
-			reqRes: number; //whether required tech is researched(? unused)
+			res: 0 | 1 | 2; //whether researched (0 - locked, 1 - unlocked, 2 - researched, should always be 1 in this case)
+			reqRes: number; //whether required tech is researched (unused)
 		}
 	}
 }

@@ -78,8 +78,8 @@ function parseResearch(modLines: string[], startIndex: number) {
 		let i = 0;
 		const res: App.Research = {
 			name: "null",
-			tab: "null",
-			category: "null",
+			tab: "CPU",
+			category: "Custom",
 			cost: 0,
 			resPoints: 0,
 			xp: 0,
