@@ -1,17 +1,16 @@
 <script lang="ts">
-	import Notification from "./Notification.svelte";
 	import { MAX_RES_X, MAX_RES_Y, parsePackageName } from "./util";
 
    export let editing: App.Package;
    export let research: App.Research | null;
    export let onSave: () => void;
    export let onCancel: () => void;
+   export let notifText: string;
 
    const Len_PackageName = 10; //package type max length
-   let notifText = "";
 
    let packageType: "DIP" | "PLCC" | "PGA" | "Custom";
-   let packageName: "DIP" | "PLCC" | "PGA" | string; //may only contain letters
+   let packageName: "DIP" | "PLCC" | "PGA" | string;
    let numPins: number;
 
    //Parse package name and pins
@@ -61,44 +60,43 @@
          notifText = "Pin count must be between <strong>2</strong> and <strong>9999</strong>!"
          return;
       }
+      if(packageName.length < 1) {
+         notifText = "Package name must not be blank!"
+         return;
+      }
 
       onSave();
    }
 </script>
 
-{#if notifText}
-   <Notification onOk={() => {notifText = "";}}>
-      {@html notifText}
-   </Notification>
-{/if}
-
-<form class="form">
+<form class="form" class:notif-visible={notifText}>
    <h3>{editing.name}</h3>
 
    <div class="row" style="justify-content: space-around; width: 100%;">
       <div class="row">
          <label>
             Package type
-            <select bind:value={packageType} on:change={() => {if(packageType == "Custom") return; packageName = packageType;}}>
+            <select bind:value={packageType} disabled={!!notifText}
+                     on:change={() => {if(packageType == "Custom") return; packageName = packageType;}}>
                <option>DIP</option>
                <option>PLCC</option>
                <option>PGA</option>
                <option>Custom</option>
             </select>
 
-            <input type="text" name="customPackageName" maxlength={Len_PackageName} spellcheck="false"
+            <input type="text" name="customPackageName" maxlength={Len_PackageName} spellcheck="false" disabled={!!notifText}
                   bind:value={packageName} style="margin-top: 4px; visibility: {packageType == "Custom" ? "visible" : "hidden"};">
          </label>
          <label>
             Pin count
-            <input type="number" min="2" max="9999" step="1" placeholder="2-9999" bind:value={numPins}>
+            <input type="number" min="2" max="9999" step="1" placeholder="2-9999" bind:value={numPins} disabled={!!notifText}>
          </label>
       </div>
 
       <div class="row-center">
          <label class="tooltip" data-tooltip="The appearance of any CPU using this package">
             Image
-            <select bind:value={editing.img}>
+            <select bind:value={editing.img} disabled={!!notifText}>
                <option>DIP14</option>
                <option>DIP18</option>
                <option>DIP24</option>
@@ -123,7 +121,7 @@
    </div>
 
    <div class="row main-columns">
-      <fieldset class="column">
+      <fieldset class="column" disabled={!!notifText}>
       <legend>Stats</legend>
          <label>
             Performance
@@ -141,7 +139,7 @@
          <span>{Math.floor((editing.perf + editing.stab + editing.build) * 100)/100} total</span>
       </fieldset>
 
-      <fieldset class="column">
+      <fieldset class="column" disabled={!!notifText}>
       <legend>Basics</legend>
          <label>
             Design cost
@@ -159,9 +157,9 @@
          <span><strong>{Math.round((editing.perf + editing.stab + editing.build) / editing.unit*100)/100}</strong> score/cost</span>
       </fieldset>
 
-      <div class="column" style="width: {editing.res < 1 ? "auto" : "288.08px"};">
+      <div class="column" style="width: {editing.res < 1 ? "auto" : "286.89px"};">
          {#if research && editing.res < 1}
-            <fieldset class="column research-fieldset">
+            <fieldset class="column research-fieldset" disabled={!!notifText}>
             <legend>Research</legend>
                <div class="row">
                   <label class="tooltip" data-tooltip="Fixed one-time cost at the beginning of the research">
@@ -207,7 +205,7 @@
       </div>
    </div>
 
-   <fieldset class="row" style="margin-top: 4px;">
+   <fieldset class="row" style="margin-top: 4px;" disabled={!!notifText}>
       <legend>Limitations</legend>
          <label class="tooltip tooltip-center" data-tooltip="Highest supported clock speed in kHz">
             Max clock
@@ -238,10 +236,10 @@
    </fieldset>
 
    <div class="row btn-row">
-      <button class="btn-menu btn-menu-cancel" type="button" on:click={onCancel}>
+      <button class="btn-menu btn-menu-cancel" type="button" on:click={onCancel} disabled={!!notifText}>
          <icon style="background-image: url('/icons/clear.svg');"/>
       </button>
-      <button class="btn-menu btn-menu-confirm" type="submit" on:click={onSaveClick}>
+      <button class="btn-menu btn-menu-confirm" type="submit" on:click={onSaveClick} disabled={!!notifText}>
          <icon style="background-image: url('/icons/check.svg');"/>
       </button>
    </div>
@@ -251,6 +249,9 @@
    .form {
       align-items: center;
       width: 82%;
+   }
+   .form.notif-visible input {
+      visibility: hidden;
    }
 
    h3 {

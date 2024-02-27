@@ -12,12 +12,14 @@
 	import { getVersion } from '@tauri-apps/api/app';
 	import Notification from '$lib/Notification.svelte';
 
+    let STATE: "editPackage" | "editMeta" | "preview" | null = null;
+    const MOD: Writable<App.ModData> = getContext('MOD');
     let errorText = "";
     let notifText = "";
-    const MOD: Writable<App.ModData> = getContext('MOD');
+    //currently displayed packages, duplicate of the mod context by default
     let packagesSorted: App.Package[] = JSON.parse(JSON.stringify($MOD?.packages ?? []));
     let sortedBy = "default"; //field name or package no. as default
-    let sortedAsc = false;
+    let sortedAsc = false; //sort descending by default
 
     function sortPackages() {
         if(sortedBy == "default") {
@@ -25,6 +27,7 @@
             if(sortedAsc) packagesSorted = packagesSorted.reverse();
             return;
         }
+
         packagesSorted = packagesSorted.sort((a: Record<string, any>, b: Record<string, any>) =>
                             a[sortedBy] < b[sortedBy] ? sortedAsc ? 1 : -1 : sortedAsc ? -1 : 1);
     }
@@ -38,22 +41,20 @@
         sortedBy = field;
     }
 
-    $: sortedBy, sortedAsc, sortPackages();
+    $: sortedBy, sortedAsc, sortPackages(); //sort packages when changing the type
     
-    let lastScroll = 0; //used to set scroll back to last position after editing
+    let lastScroll = 0; //used to set scroll back to last position after returning from the edit screen
     let editingIndex: number | null = null;
     let editingPackage: App.Package | null = null; //deep copies so you can cancel editing
     let editingResearch: App.Research | null = null;
     let editingMeta: App.ModMetadata | null = null;
-    let STATE: "editPackage" | "editMeta" | "preview" | null = null;
     let lastDeleted: {pckg: App.Package, id: number, res?: App.Research} | null = null; //last deleted package so you can undo
     let lastDeletedTimeout: ReturnType<typeof setTimeout> | null = null;
-
-    let asideExpanded = false; //is mouse in aside bar
+    let asideExpanded = false; //whether mouse is in aside bar
 
     function exitEdit() {
-        editingIndex = editingPackage = editingResearch = editingMeta = null;
-        STATE = null;
+        editingIndex = editingPackage = editingResearch = editingMeta = STATE = null;
+        notifText = "";
         setTimeout(() => window.scroll({top: lastScroll}), 0); //gay hacky thing waiting for table to render
     }
 
@@ -66,21 +67,21 @@
         const oldPckg = $MOD.packages[editingIndex];
         const oldRes = findResearch($MOD.research, oldPckg.name);
 
-        //check for invalid name
-        if(editingPackage!.name.length < 1) {
-            notifText = "The package name must not be blank!"
-            return;
-        }
+        //check if name invalid
         const parsedName = parsePackageName(editingPackage!.name);
         if(editingPackage!.name.length > 21 || !parsedName || editingPackage!.name.includes("|") || editingPackage!.name.includes(";")) {
-            notifText = "The package name is invalid!<br>It may only contain alphanumeric characters, () parentheses, and '!' '@' '#' '$' '%' '^' '&' '*' '-' '_' '=' '+' '.' ',' '?' '/' symbols."
+            notifText = "Package name is invalid!<br>It may only contain latin alphanumeric characters, () parentheses, and '!' '@' '#' '$' '%' '^' '&' '*' '-' '_' '=' '+' '.' ',' '?' '/' symbols."
             return;
         }
-        //check for duplicates
+        //check if duplicate
         const duplicateNameIndex = $MOD.packages.findIndex((p) => p.name == editingPackage!.name);
+        if((duplicateNameIndex != -1 && duplicateNameIndex != editingIndex)) {
+            notifText = "A package with the same name already exists in this mod."
+            return;
+        }
         const duplicateNameIndexGame = GAME_RESEARCH.findIndex((r) => r.name == editingPackage!.name && r.tab == "CPU");
-        if((duplicateNameIndex != -1 && duplicateNameIndex != editingIndex) || duplicateNameIndexGame != -1) {
-            notifText = "A package with the same name already exists."
+        if(duplicateNameIndexGame != -1) {
+            notifText = "A package with the same name already exists in the base game."
             return;
         }
         
@@ -105,13 +106,15 @@
 
     async function onMetaEditSave() {
         if(editingMeta) {
-            editingMeta.name = editingMeta.name.trim().replaceAll("[", "").replaceAll("]", "").slice(0, LEN_NAME);
-            editingMeta.author = editingMeta.author.trim().replaceAll("[", "").replaceAll("]", "").slice(0, LEN_AUTHOR);
-            editingMeta.version = editingMeta.version.trim().replaceAll("[", "").replaceAll("]", "").slice(0, LEN_VERSION);
+            //trim whitespace, remove brackets, and slice to fit length
+            editingMeta.name = editingMeta.name.replaceAll("[", "").replaceAll("]", "").trim().slice(0, LEN_NAME);
+            editingMeta.author = editingMeta.author.replaceAll("[", "").replaceAll("]", "").trim().slice(0, LEN_AUTHOR);
+            editingMeta.version = editingMeta.version.replaceAll("[", "").replaceAll("]", "").trim().slice(0, LEN_VERSION);
 
             const toolVersion = await getVersion();
             if(toolVersion) editingMeta.toolVersion = toolVersion.replaceAll("[", "").replaceAll("]", "");
 
+            //only save changes when fields are valid
             if(editingMeta.name.length && editingMeta.author.length && editingMeta.version.length) $MOD.meta = editingMeta;
         }
         exitEdit();
@@ -122,8 +125,8 @@
         const originalId = $MOD.packages.findIndex((p) => p.name == packagesSorted[id].name);
         editingPackage = JSON.parse(JSON.stringify($MOD.packages[originalId]));
         if(!editingPackage) return;
-        editingIndex = originalId;
         
+        editingIndex = originalId;
         if(editingPackage.res < 1)
             editingResearch = JSON.parse(JSON.stringify(findResearch($MOD.research, editingPackage.name)?.res ?? null));
 
@@ -132,10 +135,12 @@
 
     function editMeta() {
         if(STATE == "editMeta") {
+            //close metadata edit screen if already open
             STATE = null;
             return;
         }
 
+        //deep copy
         editingMeta = JSON.parse(JSON.stringify($MOD.meta));
         STATE = "editMeta";
     }
@@ -243,7 +248,7 @@
 
 <main class="row flex-fill">
 {#if STATE == "editPackage" && editingPackage}
-    <PackageEdit bind:editing={editingPackage} bind:research={editingResearch} onCancel={exitEdit} onSave={onPackageEditSave}/>
+    <PackageEdit bind:editing={editingPackage} bind:research={editingResearch} onCancel={exitEdit} onSave={onPackageEditSave} bind:notifText={notifText}/>
 {:else if $MOD}
     {#if lastDeleted}
         <footer class="bottom-notif row-center unselectable" transition:slide={{duration: 200, axis: "y"}}>
@@ -361,6 +366,7 @@
     h2 {
         font-weight: 400;
         background-color: var(--color-ht-primary);
+        box-shadow: 0 3px 2px rgba(0,0,0, 0.25);
     }
     h2 small {
         font-size: 1rem;

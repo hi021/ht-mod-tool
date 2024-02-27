@@ -32,10 +32,10 @@
 			"deb": {},
 			"icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
 			"identifier": "com.haxor.htmodtool",
-			"longDescription": "Handy tool for creating Hardware Tycoon mods",
+			"longDescription": "Handy tool for creating Hardware Tycoon mods.",
 			"macOS": {},
 			"shortDescription": "Hardware Tycoon Mod Tool",
-			"targets": ["deb", "appimage", "nsis", "app"],
+			"targets": ["deb", "appimage", "msi", "app"],
 			"windows": {}
 		},
 		"security": {},
@@ -43,7 +43,7 @@
 		"windows": [
 			{
 				"fullscreen": false,
-				"center": true,
+				"center": false,
 				"height": 720,
 				"minHeight": 400,
 				"resizable": true,
