@@ -69,7 +69,7 @@
    }
 </script>
 
-<form class="form" class:notif-visible={notifText}>
+<div class="form" class:notif-visible={notifText}>
    <h3>{editing.name}</h3>
 
    <div class="row" style="justify-content: space-around; width: 100%;">
@@ -243,7 +243,7 @@
          <icon style="background-image: url('/icons/check.svg');"/>
       </button>
    </div>
-</form>
+</div>
 
 <style>
    .form {
