@@ -82,13 +82,6 @@
                     autocomplete="off" maxlength="{LEN_VERSION}" spellcheck="false" bind:value={version}>
             <small class="text-length">{version.length}/{LEN_VERSION}</small>
         </label>
-        <label>
-            Hardware Tycoon version
-            <select class:error={errors.gameVersion} name="game version" on:change={() => errors.gameVersion = false}
-                    bind:value={gameVersion}>
-                <option>{HT_VERSION}</option>
-            </select>
-        </label>
 
         {#if errorMsg}
             <p class="error-p">{errorMsg}</p>

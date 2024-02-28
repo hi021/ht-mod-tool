@@ -65,10 +65,10 @@
    
    <div class="btn-container column flex-fill">
       {#if $MOD?.meta && !pageChange}
-         <button class="main-menu-btn" on:click={() => {pageChange = true; goto("/edit")}}>Continue Editing {$MOD.meta.name}</button>
+         <button class="main-menu-btn" disabled={!!notifType} on:click={() => {pageChange = true; goto("/edit")}}>Continue Editing {$MOD.meta.name}</button>
       {/if}
-      <button class="main-menu-btn" disabled={pageChange} on:click={() => {pageChange = true; goto("/new");}}>New Modification</button>
-      <button class="main-menu-btn" disabled={pageChange} on:click={loadMod}>Load Modification</button>
+      <button class="main-menu-btn" disabled={pageChange || !!notifType} on:click={() => {pageChange = true; goto("/new");}}>New Modification</button>
+      <button class="main-menu-btn" disabled={pageChange || !!notifType} on:click={loadMod}>Load Modification</button>
       {#if errorText}
          <p class="error-p">{errorText}</p>
       {/if}
