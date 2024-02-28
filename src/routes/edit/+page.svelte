@@ -23,7 +23,7 @@
 
     function sortPackages() {
         if(sortedBy == "default") {
-            packagesSorted = JSON.parse(JSON.stringify($MOD.packages));
+            packagesSorted = JSON.parse(JSON.stringify($MOD?.packages ?? []));
             if(sortedAsc) packagesSorted = packagesSorted.reverse();
             return;
         }
@@ -356,7 +356,7 @@
         Looks like the mod was loaded incorrectly.<br>
         Please reload the editor.
     </p>
-    <button class="btn-blue" style="color: #eee;" on:click={() => goto('/')}>Back</button>
+    <button class="btn" style="color: #eee;" on:click={() => goto('/')}>Back</button>
 </div>
 {/if}
 </main>
